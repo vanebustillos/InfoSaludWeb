@@ -1,20 +1,22 @@
 <template>
   <div class="text-center">
-    <v-btn class="ma-2" large @click="addhospital()">cargar Hospital</v-btn>
+    <v-btn class="ma-2" large @click.stop="addhospital()">Add Hospital</v-btn>
     <h1>This is an</h1>
   </div>
 </template>
 <script>
-//import { mapActions } from "vuex";
 const db = require("@/firebaseConfig.js");
+import { mapGetters, mapActions } from "vuex";
 export default {
   name: "Hospital",
   //data() {
   //  return 0;
   //},
-  computed: {},
+  computed: {
+    ...mapGetters(["getHospitals"])
+  },
   methods: {
-    // ...mapActions(["setHospital"]),
+    ...mapActions(["setHospital"]),
     addhospital() {
       //this.setHospital({
       db.hospitalCollection.doc("H1").set({
