@@ -185,18 +185,19 @@ export default {
       services: [],
       attention: "",
       available: Boolean,
+      facebook: "",
       items: [
         {
-          src: "https://www.marcelovaldivia.com/img/univalle.png",
+          src: "https://www.boliviaentusmanos.com/amarillas/blogos/clinica-los-angeles-logo.jpg",
         },
         {
-          src: "https://lh3.googleusercontent.com/proxy/HhqL0xUfYqYAHmIqLKXEVzUCD90yRIQ_d2gv1P4YsaD0zqxYNXKOA_VkVI4cvACnbSbjDTP0eROclLIGHcZW4kcXKFqtx_4AWvRN2c1jwh93h15JSXby7hEVG1LD49RMr-mLpJi0sMMbj7qMAoq3uB7MFvQ",
+          src: "https://www.lostiempos.com/sites/default/files/styles/noticia_home_apertura/public/media_imagen/2017/1/21/1eesp02-03_los_angeles.jpg?itok=Rt7zY4Eg",
         },
         {
-          src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzKpAldb8Q1XMfvA1e1E2DQ_YPUAmZh4dMdA&usqp=CAU",
+          src: "https://correodelsur.com/img/contents/images_980/2017/06/25/nota63825_imagen63141.jpg",
         },
         {
-          src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE3XrQjTWLHlKeQHjkuqbpwzAlXbIzy87sFA&usqp=CAU",
+          src: "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/clinica_los_angeles_1.jpg", 
         },
       ],
     };
@@ -207,11 +208,12 @@ export default {
   },
   methods: {
     _retrieveData() {
-      db.collection("hospitales")
-        .doc("H2")
+      db.collection("clinicas")
+        .doc("C1")
         .get()
         .then((querySnapshot) => {
           this.name = querySnapshot.data().name;
+          console.log(querySnapshot.data().name);
           this.address = querySnapshot.data().location;
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
