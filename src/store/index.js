@@ -34,7 +34,7 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    getHospitals(state){
+    getHospitals(state) {
       return state.hospitales;
     }
   },
