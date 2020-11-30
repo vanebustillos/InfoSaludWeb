@@ -10,10 +10,22 @@ const routes = [
     component: Home
   },
   {
-    path: "/hospital",
+    path: "/hospitales",
     name: "Hospital",
     component: () =>
       import(/* webpackChunkName: "about" */ "../components/Hospital.vue")
+  },
+  {
+    path: "/clinicas",
+    name: "Clinicas",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Clinicas.vue")
+  },
+  {
+    path: "/medicos",
+    name: "Medicos",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Medicos.vue")
   },
   {
     path: "/about",
