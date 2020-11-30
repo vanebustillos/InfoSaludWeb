@@ -1,38 +1,69 @@
 <template>
-  <div class="text-center">
-    <v-btn class="ma-2" large @click.stop="addhospital()">Add Hospital</v-btn>
-    <h1>This is an</h1>
+  <div>
+    <v-container>
+      <v-row v-for="(hospital, index) in hospitals" :key="index">
+        <v-col cols="12" md="7">
+          <v-card tile hover>
+            <v-list-item three-line>
+              <v-list-item-avatar tile size="100" color="#FFFFFF">
+                <v-img :src="hospital.img"></v-img>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title class="headline">
+                  {{ hospital.name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  <v-icon> mdi-map-marker </v-icon>
+                  {{ hospital.location }}
+                </v-list-item-subtitle>
+                <v-list-item-subtitle>
+                  <v-icon> mdi-phone </v-icon>
+                  {{ hospital.phones }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <v-btn
+                class="ma-2"
+                id="info"
+                :rounded="true"
+                @click.stop="openInfoDialog(hospital.id)"
+                >Ver más</v-btn
+              >
+            </v-list-item>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 <script>
-const db = require("@/firebaseConfig.js");
-import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
+import { db } from "@/firebaseConfig.js";
 export default {
-  name: "Hospital",
-  //data() {
-  //  return 0;
-  //},
+  data() {
+    return {
+      hospitals: []
+    };
+  },
+  created() {
+    this._getHospitales();
+  },
   computed: {
-    ...mapGetters(["getHospitals"])
+    ...mapGetters(["getHospitalsData"])
   },
   methods: {
-    ...mapActions(["setHospital"]),
-    addhospital() {
-      //this.setHospital({
-      db.hospitalCollection.doc("H1").set({
-        id: "H1",
-        name: "Univalle",
-        location: "Tiquipaya",
-        map: 12,
-        description: "sad",
-        schedule: "saa",
-        phones: [4312334, 43424],
-        email: "@w",
-        specialties: ["sa", "sasa"],
-        availabilityEmergencyRoom: "ds",
-        public_private: "private"
-      });
-      console.log("saved");
+    ...mapActions(["getHospitals"]),
+    _getHospitales() {
+      db.collection("hospitales")
+        .limit(2)
+        .orderBy("id")
+        .get()
+        .then(querySnapshot => {
+          //Get the last element
+          this.last = querySnapshot.docs[querySnapshot.docs.length - 1];
+          querySnapshot.forEach(doc => {
+            this.hospitals.push(doc.data());
+          });
+        });
     }
   }
 };
