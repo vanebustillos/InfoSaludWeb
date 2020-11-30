@@ -19,7 +19,7 @@ export default {
     ...mapActions(["setHospital"]),
     addhospital() {
       //this.setHospital({
-      db.hospitalCollection.doc("H1").set({
+      db.hospitalCollection.doc("H3").set({
         id: "H1",
         name: "Univalle",
         location: "Tiquipaya",

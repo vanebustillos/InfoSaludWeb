@@ -111,12 +111,10 @@
               <v-btn
                 depressed
                 large
-                :loading="loading3"
-                :disabled="loading3"
                 color="#82c9eb"
                 class="white--text ma-2 "
                 v-if="newMovement"
-                @click="addAppointment(), (loader = 'loading3')"
+                @click="addAppointment()"
                 >SAVE
                 <v-icon right dark>mdi-checkbox-marked-circle</v-icon>
               </v-btn>
@@ -143,7 +141,9 @@
 </template>
 
 <script>
-// import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
+// import { db } from "@/firebaseConfig.js";
+// const db = require("@/firebaseConfig.js");
 
 export default {
   name: "Citas",
@@ -179,15 +179,48 @@ export default {
       }
     }
   },
-  computed: {},
+  computed: {
+    ...mapGetters(["getAppointments"]),
+    appointments_list() {
+      return this.getAppointments;
+    }
+  },
   methods: {
+    ...mapActions(["setAppointment"]),
     cancel() {
-      this.$emit("close");
-      this.scheduledAppointment.name = "";
-      this.scheduledAppointment.description = "";
-      this.scheduledAppointment.date = "";
-      this.scheduledAppointment.startHour = "";
-      this.scheduledAppointment.endHour = "";
+      // this.$emit("close");
+      this.appointment.id = "";
+      this.appointment.clientName = "";
+      this.appointment.clientSurnames = "";
+      this.appointment.clientCi = "";
+      this.appointment.clientPhone = "";
+      this.appointment.date = "";
+      this.appointment.hour = "";
+    },
+
+    addAppointment() {
+      this.setAppointment({
+        id: "cita-2",
+        clientName: this.appointment.clientName,
+        clientSurnames: this.appointment.clientSurnames,
+        clientCi: this.appointment.clientCi,
+        clientPhone: this.appointment.clientPhone,
+        date: this.appointment.date,
+        hour: this.appointment.hour
+      });
+      this.cancel();
+
+      alert("La cita ha sido guardada exitosamente");
+    },
+
+    getAppointmentId() {
+      let newId = 1;
+      let numberOfAppointments = this.getAppointments.length;
+      if (numberOfAppointments > 0) {
+        let lastId = this.getAppointments[numberOfAppointments - 1].id;
+        newId = parseInt(lastId.split("-")[1]) + 1;
+      }
+      return "Cita-" + newId;
     }
   }
 };
