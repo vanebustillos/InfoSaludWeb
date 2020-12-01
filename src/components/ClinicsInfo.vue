@@ -139,14 +139,15 @@
                   Horarios de Atención
                 </v-list-item-title>
                 <v-divider></v-divider>
-                <v-list-item-subtitle>
-                  {{ attention }}
+                <v-list-item-subtitle v-for="hour in attention"
+                  :key="hour.id">
+                  {{ hour }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-if="available">
-                  Espacios disponibles en sala de emergencia
+                  Espacios disponibles para agendar una cita
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-else>
-                  No existen espacios disponibles en sala de emergencia
+                  No existen espacios disponibles para agendar una cita
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -183,7 +184,7 @@ export default {
       facebook: "",
       specialties: [],
       services: [],
-      attention: "",
+      attention: [],
       available: Boolean,
       facebook: "",
       items: [
@@ -218,8 +219,32 @@ export default {
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
-          this.attention = querySnapshot.data().attention;
 
+          let cont=0;
+          querySnapshot.data().attention.forEach((hour) => {
+            if (cont == 0){
+              this.attention.push("Lunes: "+hour);
+              cont++;
+            }else if (cont == 1){
+              this.attention.push("Martes: "+hour);
+              cont++;
+            }else if (cont == 2){
+              this.attention.push("Miércoles: "+hour);
+              cont++;
+            }else if (cont == 3){
+              this.attention.push("Jueves: "+hour);
+              cont++;
+            }else if (cont == 4){
+              this.attention.push("Viernes: "+hour);
+              cont++;
+            }else if (cont == 5){
+              this.attention.push("Sábado: "+hour);
+              cont++;
+            }else if (cont == 6){
+              this.attention.push("Domingo: "+hour);
+              cont=0;
+            }
+          });
           querySnapshot.data().phones.forEach((phone) => {
             if (this.telephones == "") {
               this.telephones = phone;

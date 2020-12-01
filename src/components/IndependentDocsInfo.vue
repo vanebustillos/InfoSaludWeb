@@ -27,7 +27,7 @@
           </v-card>
         </v-col>
         <v-col cols="6" md="5">
-          <v-card class="pa-2" outlined tile>
+          <v-card class="pa-2" outlined tile height="150">
             <v-list-item three-line>
               <v-list-item-content>
                 <v-list-item-title class="headline">
@@ -117,14 +117,15 @@
                   Horarios de Atención
                 </v-list-item-title>
                 <v-divider></v-divider>
-                <v-list-item-subtitle>
-                  {{ attention }}
+                <v-list-item-subtitle v-for="hour in attention"
+                  :key="hour.id">
+                  {{ hour }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-if="available">
-                  Espacios disponibles en sala de emergencia
+                  Espacios disponibles para agendar una cita
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-else>
-                  No existen espacios disponibles en sala de emergencia
+                  No existen espacios disponibles para agendar una cita
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -159,21 +160,25 @@ export default {
       email: "",
       facebook: "",
       specialties: [],
-      attention: "",
+      attention: [],
       available: Boolean,
       facebook: "",
       items: [
         {
-          src: "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-3.jpg",
+          src:
+            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-3.jpg",
         },
         {
-          src: "https://www.boliviaentusmanos.com/amarillas/blogos/dra-janneth-duran-la-fuente-logo.jpg",
+          src:
+            "https://www.boliviaentusmanos.com/amarillas/blogos/dra-janneth-duran-la-fuente-logo.jpg",
         },
         {
-          src: "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-5.jpg",
+          src:
+            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-5.jpg",
         },
         {
-          src: "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-7.jpg", 
+          src:
+            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-7.jpg",
         },
       ],
     };
@@ -188,13 +193,38 @@ export default {
         .doc("MI1")
         .get()
         .then((querySnapshot) => {
-          this.name = querySnapshot.data().name + " " + querySnapshot.data().lastname;
-          console.log(querySnapshot.data().name);
+          this.name =
+            querySnapshot.data().name + " " + querySnapshot.data().lastname;
           this.address = querySnapshot.data().location;
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
-          this.attention = querySnapshot.data().attention;
+          
+          let cont=0;
+          querySnapshot.data().attention.forEach((hour) => {
+            if (cont == 0){
+              this.attention.push("Lunes: "+hour);
+              cont++;
+            }else if (cont == 1){
+              this.attention.push("Martes: "+hour);
+              cont++;
+            }else if (cont == 2){
+              this.attention.push("Miércoles: "+hour);
+              cont++;
+            }else if (cont == 3){
+              this.attention.push("Jueves: "+hour);
+              cont++;
+            }else if (cont == 4){
+              this.attention.push("Viernes: "+hour);
+              cont++;
+            }else if (cont == 5){
+              this.attention.push("Sábado: "+hour);
+              cont++;
+            }else if (cont == 6){
+              this.attention.push("Domingo: "+hour);
+              cont=0;
+            }
+          });
 
           querySnapshot.data().phones.forEach((phone) => {
             if (this.telephones == "") {
