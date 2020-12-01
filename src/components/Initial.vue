@@ -1,18 +1,20 @@
 <template>
   <div>
+    <br />
     <v-row class="mb-6" justify="center" dense>
-      <v-col color="secondary" cols="11">
+      <v-col color="secondary" cols="10">
         <v-carousel
-          :cycle="cycle"
           hide-delimiter-background
           delimiter-icon="mdi-minus"
-          height="300"
+          height="550"
         >
-          <v-carousel-item
-            v-for="(item, i) in items"
-            :key="i"
-            :src="item.src"
-          ></v-carousel-item>
+          <div class="secondary" dark>
+            <v-carousel-item
+              v-for="(item, i) in items"
+              :key="i"
+              :src="item.src"
+            ></v-carousel-item>
+          </div>
         </v-carousel>
       </v-col>
     </v-row>
@@ -30,6 +32,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <span>{{ card.description }}</span>
+              <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -83,13 +86,13 @@ export default {
   methods: {
     routingViews(clicked) {
       if (clicked == "Hospitales") {
-        this.$router.push("/about");
+        this.$router.push("/about").catch(() => {});
       }
       if (clicked == "Clínicas") {
-        this.$router.push("/hospital");
+        this.$router.push("/hospital").catch(() => {});
       }
       if (clicked == "Médicos") {
-        this.$router.push("/about");
+        this.$router.push("/about").catch(() => {});
       }
     }
   }

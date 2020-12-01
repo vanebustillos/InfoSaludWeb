@@ -15,7 +15,7 @@
       <v-spacer></v-spacer>
       <v-spacer></v-spacer>
       <div>
-        <v-btn icon>
+        <v-btn icon @click="home()">
           <v-icon>mdi-home</v-icon>
           <label>Inicio</label>
         </v-btn>
@@ -48,8 +48,7 @@
         </v-btn>
       </div>
     </v-app-bar>
-    <div><br /></div>
-    <v-main>
+    <v-main class="background">
       <router-view />
     </v-main>
   </v-app>
@@ -67,6 +66,11 @@ export default {
 
   data() {
     return {};
+  },
+  methods: {
+    home() {
+      this.$router.push("/").catch(() => {});
+    }
   }
 };
 </script>
