@@ -86,13 +86,13 @@ export default {
   methods: {
     routingViews(clicked) {
       if (clicked == "Hospitales") {
-        this.$router.push("/about").catch(() => {});
+        this.$router.push("/hospitales").catch(() => {});
       }
       if (clicked == "Clínicas") {
-        this.$router.push("/hospital").catch(() => {});
+        this.$router.push("/clinicas").catch(() => {});
       }
       if (clicked == "Médicos") {
-        this.$router.push("/about").catch(() => {});
+        this.$router.push("/medicos").catch(() => {});
       }
     }
   }
