@@ -175,6 +175,7 @@ export default {
 
   data() {
     return {
+      id: "",
       name: "",
       address: "",
       telephones: "",
@@ -207,16 +208,19 @@ export default {
   },
   computed: {},
   mounted() {
+    this.id=this._getId();
     this._retrieveData();
   },
   methods: {
+    _getId() {
+        return this.$route.params.id;
+    },
     _retrieveData() {
       db.collection("clinicas")
-        .doc("C1")
+        .doc(this.id)
         .get()
         .then(querySnapshot => {
           this.name = querySnapshot.data().name;
-          console.log(querySnapshot.data().name);
           this.address = querySnapshot.data().location;
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;

@@ -21,13 +21,17 @@
                   {{ medico.phones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-btn
+              <router-link :to="{
+                name: 'IndependentDocsInfo',
+                params: { id: medico.id }
+              }">
+                <v-btn
                 class="ma-2"
                 id="info"
                 :rounded="true"
-                @click.stop="openInfoDialog(medico.id)"
                 >Ver más</v-btn
               >
+              </router-link>
             </v-list-item>
           </v-card>
         </v-col>
@@ -38,12 +42,15 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { db } from "@/firebaseConfig.js";
+import router from "@/router/index.js";
+
 export default {
   data() {
     return {
       medicos: []
     };
   },
+  router,
   created() {
     this._getmedicos();
   },

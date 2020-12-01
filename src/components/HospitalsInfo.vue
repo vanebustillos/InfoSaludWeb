@@ -176,6 +176,7 @@ export default {
 
   data() {
     return {
+      id:"",
       name: "",
       address: "",
       telephones: "",
@@ -204,12 +205,16 @@ export default {
   },
   computed: {},
   mounted() {
+    this.id=this._getId();
     this._retrieveData();
   },
   methods: {
+    _getId() {
+        return this.$route.params.id;
+    },
     _retrieveData() {
       db.collection("hospitales")
-        .doc("H2")
+        .doc(this.id)
         .get()
         .then((querySnapshot) => {
           this.name = querySnapshot.data().name;

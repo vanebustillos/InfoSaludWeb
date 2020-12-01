@@ -28,19 +28,19 @@ const routes = [
       import(/* webpackChunkName: "about" */ "../components/Medicos.vue")
   },
   {
-    path: "/hospitalsInfo",
+    path: "/hospitalsInfo/:id",
     name: "HospitalsInfo",
     component: () =>
       import(/* webpackChunkName: "about" */ "../components/HospitalsInfo.vue")
   },
   {
-    path: "/clinicsInfo",
+    path: "/clinicsInfo/:id",
     name: "ClinicsInfo",
     component: () =>
       import(/* webpackChunkName: "about" */ "../components/ClinicsInfo.vue")
   },
   {
-    path: "/independentDocsInfo",
+    path: "/independentDocsInfo/:id",
     name: "IndependentDocsInfo",
     component: () =>
       import(
