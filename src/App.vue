@@ -6,34 +6,49 @@
           alt="Vuetify Logo"
           class="shrink mr-2"
           contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          src="@/assets/logo1.jpg"
           transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
+          width="200"
         />
       </div>
-
       <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
+      <div>
+        <v-btn icon @click="home()">
+          <v-icon>mdi-home</v-icon>
+          <label>Inicio</label>
+        </v-btn>
+      </div>
+      <v-spacer></v-spacer>
+      <div>
+        <v-btn icon>
+          <v-icon>mdi-hospital-building</v-icon>
+          <label>hospitales</label>
+        </v-btn>
+      </div>
+      <v-spacer></v-spacer>
+      <div>
+        <v-btn icon>
+          <v-icon>mdi-hospital</v-icon>
+          <label>clínicas</label>
+        </v-btn>
+      </div>
+      <v-spacer></v-spacer>
+      <div>
+        <v-btn icon>
+          <v-icon>mdi-doctor</v-icon>
+          <label>médicos</label>
+        </v-btn>
+      </div>
+      <v-spacer></v-spacer>
+      <div>
+        <v-btn icon>
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+      </div>
     </v-app-bar>
-
-    <v-main>
+    <v-main class="background">
       <router-view />
     </v-main>
   </v-app>
@@ -49,8 +64,13 @@ export default {
     // HelloWorld
   },
 
-  data: () => ({
-    //
-  })
+  data() {
+    return {};
+  },
+  methods: {
+    home() {
+      this.$router.push("/").catch(() => {});
+    }
+  }
 };
 </script>
