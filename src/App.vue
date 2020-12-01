@@ -22,24 +22,30 @@
       </div>
       <v-spacer></v-spacer>
       <div>
-        <v-btn icon>
-          <v-icon>mdi-hospital-building</v-icon>
-          <label>hospitales</label>
-        </v-btn>
+        <router-link to="/hospitales" tag="v-btn">
+          <v-btn icon>
+            <v-icon>mdi-hospital-building</v-icon>
+            <label>hospitales</label>
+          </v-btn>
+        </router-link>
       </div>
       <v-spacer></v-spacer>
       <div>
-        <v-btn icon>
-          <v-icon>mdi-hospital</v-icon>
-          <label>clínicas</label>
-        </v-btn>
+        <router-link to="/clinicas" tag="v-btn">
+          <v-btn icon>
+            <v-icon>mdi-hospital</v-icon>
+            <label>clínicas</label>
+          </v-btn>
+        </router-link>
       </div>
       <v-spacer></v-spacer>
       <div>
-        <v-btn icon>
-          <v-icon>mdi-doctor</v-icon>
-          <label>médicos</label>
-        </v-btn>
+        <router-link to="/medicos" tag="v-btn">
+          <v-btn icon>
+            <v-icon>mdi-doctor</v-icon>
+            <label>médicos</label>
+          </v-btn>
+        </router-link>
       </div>
       <v-spacer></v-spacer>
       <div>

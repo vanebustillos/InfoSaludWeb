@@ -162,7 +162,6 @@ export default {
       specialties: [],
       attention: [],
       available: Boolean,
-      facebook: "",
       items: [
         {
           src:

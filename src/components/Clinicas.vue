@@ -1,31 +1,31 @@
 <template>
   <div>
     <v-container>
-      <v-row v-for="(hospital, index) in hospitals" :key="index">
+      <v-row v-for="(clinica, index) in clinicas" :key="index">
         <v-col cols="12" md="7">
           <v-card tile hover>
             <v-list-item three-line>
               <v-list-item-avatar tile size="100" color="#FFFFFF">
-                <v-img :src="hospital.img"></v-img>
+                <v-img :src="clinica.img"></v-img>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="headline">
-                  {{ hospital.name }}
+                  {{ clinica.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   <v-icon> mdi-map-marker </v-icon>
-                  {{ hospital.location }}
+                  {{ clinica.location }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle>
                   <v-icon> mdi-phone </v-icon>
-                  {{ hospital.phones }}
+                  {{ clinica.phones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-btn
                 class="ma-2"
                 id="info"
                 :rounded="true"
-                @click.stop="openInfoDialog(hospital.id)"
+                @click.stop="openInfoDialog(clinica.id)"
                 >Ver más</v-btn
               >
             </v-list-item>
@@ -41,19 +41,19 @@ import { db } from "@/firebaseConfig.js";
 export default {
   data() {
     return {
-      hospitals: []
+      clinicas: []
     };
   },
   created() {
-    this._getHospitales();
+    this._getclinicas();
   },
   computed: {
-    ...mapGetters(["getHospitalsData"])
+    ...mapGetters(["getclinicasData"])
   },
   methods: {
-    ...mapActions(["getHospitals"]),
-    _getHospitales() {
-      db.collection("hospitales")
+    ...mapActions(["getclinicas"]),
+    _getclinicas() {
+      db.collection("clinicas")
         .limit(2)
         .orderBy("id")
         .get()
@@ -61,7 +61,7 @@ export default {
           //Get the last element
           this.last = querySnapshot.docs[querySnapshot.docs.length - 1];
           querySnapshot.forEach(doc => {
-            this.hospitals.push(doc.data());
+            this.clinicas.push(doc.data());
           });
         });
     }

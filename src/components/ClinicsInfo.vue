@@ -139,8 +139,7 @@
                   Horarios de Atención
                 </v-list-item-title>
                 <v-divider></v-divider>
-                <v-list-item-subtitle v-for="hour in attention"
-                  :key="hour.id">
+                <v-list-item-subtitle v-for="hour in attention" :key="hour.id">
                   {{ hour }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-if="available">
@@ -186,19 +185,22 @@ export default {
       services: [],
       attention: [],
       available: Boolean,
-      facebook: "",
       items: [
         {
-          src: "https://www.boliviaentusmanos.com/amarillas/blogos/clinica-los-angeles-logo.jpg",
+          src:
+            "https://www.boliviaentusmanos.com/amarillas/blogos/clinica-los-angeles-logo.jpg"
         },
         {
-          src: "https://www.lostiempos.com/sites/default/files/styles/noticia_home_apertura/public/media_imagen/2017/1/21/1eesp02-03_los_angeles.jpg?itok=Rt7zY4Eg",
+          src:
+            "https://www.lostiempos.com/sites/default/files/styles/noticia_home_apertura/public/media_imagen/2017/1/21/1eesp02-03_los_angeles.jpg?itok=Rt7zY4Eg"
         },
         {
-          src: "https://correodelsur.com/img/contents/images_980/2017/06/25/nota63825_imagen63141.jpg",
+          src:
+            "https://correodelsur.com/img/contents/images_980/2017/06/25/nota63825_imagen63141.jpg"
         },
         {
-          src: "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/clinica_los_angeles_1.jpg", 
+          src:
+            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/clinica_los_angeles_1.jpg"
         },
       ],
     };
@@ -212,7 +214,7 @@ export default {
       db.collection("clinicas")
         .doc("C1")
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.name = querySnapshot.data().name;
           console.log(querySnapshot.data().name);
           this.address = querySnapshot.data().location;

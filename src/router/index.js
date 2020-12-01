@@ -10,10 +10,22 @@ const routes = [
     component: Home
   },
   {
-    path: "/hospital",
+    path: "/hospitales",
     name: "Hospital",
     component: () =>
       import(/* webpackChunkName: "about" */ "../components/Hospital.vue")
+  },
+  {
+    path: "/clinicas",
+    name: "Clinicas",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Clinicas.vue")
+  },
+  {
+    path: "/medicos",
+    name: "Medicos",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Medicos.vue")
   },
   {
     path: "/hospitalsInfo",
@@ -31,7 +43,9 @@ const routes = [
     path: "/independentDocsInfo",
     name: "IndependentDocsInfo",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../components/IndependentDocsInfo.vue")
+      import(
+        /* webpackChunkName: "about" */ "../components/IndependentDocsInfo.vue"
+      )
   },
   {
     path: "/about",
