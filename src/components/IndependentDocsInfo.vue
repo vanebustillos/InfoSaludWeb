@@ -117,8 +117,7 @@
                   Horarios de Atención
                 </v-list-item-title>
                 <v-divider></v-divider>
-                <v-list-item-subtitle v-for="hour in attention"
-                  :key="hour.id">
+                <v-list-item-subtitle v-for="hour in attention" :key="hour.id">
                   {{ hour }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-if="available">
@@ -165,21 +164,21 @@ export default {
       items: [
         {
           src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-3.jpg",
+            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-3.jpg"
         },
         {
           src:
-            "https://www.boliviaentusmanos.com/amarillas/blogos/dra-janneth-duran-la-fuente-logo.jpg",
+            "https://www.boliviaentusmanos.com/amarillas/blogos/dra-janneth-duran-la-fuente-logo.jpg"
         },
         {
           src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-5.jpg",
+            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-5.jpg"
         },
         {
           src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-7.jpg",
-        },
-      ],
+            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-7.jpg"
+        }
+      ]
     };
   },
   computed: {},
@@ -191,54 +190,53 @@ export default {
       db.collection("medicosInd")
         .doc("MI1")
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.name =
             querySnapshot.data().name + " " + querySnapshot.data().lastname;
           this.address = querySnapshot.data().location;
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
-          
-          let cont=0;
-          querySnapshot.data().attention.forEach((hour) => {
-            if (cont == 0){
-              this.attention.push("Lunes: "+hour);
+          let cont = 0;
+          querySnapshot.data().attention.forEach(hour => {
+            if (cont == 0) {
+              this.attention.push("Lunes: " + hour);
               cont++;
-            }else if (cont == 1){
-              this.attention.push("Martes: "+hour);
+            } else if (cont == 1) {
+              this.attention.push("Martes: " + hour);
               cont++;
-            }else if (cont == 2){
-              this.attention.push("Miércoles: "+hour);
+            } else if (cont == 2) {
+              this.attention.push("Miércoles: " + hour);
               cont++;
-            }else if (cont == 3){
-              this.attention.push("Jueves: "+hour);
+            } else if (cont == 3) {
+              this.attention.push("Jueves: " + hour);
               cont++;
-            }else if (cont == 4){
-              this.attention.push("Viernes: "+hour);
+            } else if (cont == 4) {
+              this.attention.push("Viernes: " + hour);
               cont++;
-            }else if (cont == 5){
-              this.attention.push("Sábado: "+hour);
+            } else if (cont == 5) {
+              this.attention.push("Sábado: " + hour);
               cont++;
-            }else if (cont == 6){
-              this.attention.push("Domingo: "+hour);
-              cont=0;
+            } else if (cont == 6) {
+              this.attention.push("Domingo: " + hour);
+              cont = 0;
             }
           });
 
-          querySnapshot.data().phones.forEach((phone) => {
+          querySnapshot.data().phones.forEach(phone => {
             if (this.telephones == "") {
               this.telephones = phone;
             } else {
               this.telephones = this.telephones + " - " + phone;
             }
           });
-          querySnapshot.data().specialties.forEach((specialty) => {
+          querySnapshot.data().specialties.forEach(specialty => {
             this.specialties.push(specialty);
           });
           if (querySnapshot.data().availability) this.available = true;
           else this.available = false;
         });
-    },
-  },
+    }
+  }
 };
 </script>

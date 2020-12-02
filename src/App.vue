@@ -22,25 +22,24 @@
       </div>
       <v-spacer></v-spacer>
       <div>
-          <v-btn icon @click="hospital()">
-            <v-icon>mdi-hospital-building</v-icon>
-            <label>hospitales</label>
-          </v-btn>
-        </router-link>
+        <v-btn icon @click="hospital()">
+          <v-icon>mdi-hospital-building</v-icon>
+          <label>hospitales</label>
+        </v-btn>
       </div>
       <v-spacer></v-spacer>
       <div>
-          <v-btn icon @click="clinicas()">
-            <v-icon>mdi-hospital</v-icon>
-            <label>clínicas</label>
-          </v-btn>
+        <v-btn icon @click="clinicas()">
+          <v-icon>mdi-hospital</v-icon>
+          <label>clínicas</label>
+        </v-btn>
       </div>
       <v-spacer></v-spacer>
       <div>
-          <v-btn icon @click="medicos()">
-            <v-icon>mdi-doctor</v-icon>
-            <label>médicos</label>
-          </v-btn>
+        <v-btn icon @click="medicos()">
+          <v-icon>mdi-doctor</v-icon>
+          <label>médicos</label>
+        </v-btn>
       </div>
       <v-spacer></v-spacer>
       <div>
@@ -49,7 +48,7 @@
         </v-btn>
       </div>
     </v-app-bar>
-    <v-main class="background">
+    <v-main>
       <router-view />
     </v-main>
   </v-app>

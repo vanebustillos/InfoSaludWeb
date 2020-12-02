@@ -1,5 +1,26 @@
 <template>
   <div>
+    <v-container fluid>
+      <v-row align="center">
+        <v-spacer></v-spacer>
+        <v-col class="d-flex" cols="12" sm="4">
+          <v-select
+            :items="especialties"
+            v-model="selectedEspecialty"
+            item-text="name"
+            label="Especialidades"
+            outlined
+            solo
+          ></v-select>
+        </v-col>
+        <v-col class="d-flex" cols="12" sm="4">
+          <v-btn img color="primary" i:hover>
+            Buscar
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
     <v-container>
       <v-row v-for="(medico, index) in medicos" :key="index">
         <v-col cols="12" md="7">
@@ -41,11 +62,14 @@ import { db } from "@/firebaseConfig.js";
 export default {
   data() {
     return {
-      medicos: []
+      medicos: [],
+      especialties: [],
+      selectedEspecialty: ""
     };
   },
   created() {
     this._getmedicos();
+    this._getEspecialties();
   },
   computed: {
     ...mapGetters(["getmedicosData"])
@@ -62,6 +86,17 @@ export default {
           this.last = querySnapshot.docs[querySnapshot.docs.length - 1];
           querySnapshot.forEach(doc => {
             this.medicos.push(doc.data());
+          });
+        });
+    },
+    _getEspecialties() {
+      db.collection("especialidades")
+        .limit(2)
+        .orderBy("name")
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            this.especialties.push(doc.data());
           });
         });
     }
