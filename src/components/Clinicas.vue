@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-container fluid>
-      <v-row align="center">
-        <v-col class="d-flex" cols="12" sm="4">
+      <v-row class="mx-auto">
+        <v-col class="d-flex" cols="12" sm="6">
           <v-spacer></v-spacer>
           <v-select
             :items="regions"
@@ -23,9 +23,8 @@
             solo
           ></v-select>
         </v-col>
-        <v-col class="d-flex" cols="12" sm="4">
-          <v-btn img color="primary" i:hover>
-            Buscar
+        <v-col class="d-flex" cols="12" sm="2">
+          <v-btn img color="primary" i:hover fab>
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-col>
@@ -33,8 +32,8 @@
     </v-container>
     <v-container>
       <v-row v-for="(clinica, index) in clinicas" :key="index">
-        <v-col cols="12" md="7">
-          <v-card tile hover>
+        <v-col class="mx-auto" cols="12" md="7">
+          <v-card tile hover color="#F6F6F6">
             <v-list-item three-line>
               <v-list-item-avatar tile size="100" color="#FFFFFF">
                 <v-img :src="clinica.img"></v-img>
@@ -56,6 +55,7 @@
                 class="ma-2"
                 id="info"
                 :rounded="true"
+                color="#D6DBDF"
                 @click.stop="openInfoDialog(clinica.id)"
                 >Ver más</v-btn
               >
