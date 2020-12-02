@@ -6,7 +6,7 @@
       <v-btn
         icon
         color="#304050"
-        v-on:click="sendData(appointment, true)"
+        v-on:click="sendData(appointment)"
         class="mx-5"
       >
         Add
@@ -19,7 +19,6 @@
     </v-toolbar>
     <Citas
       :appointment="appointment"
-      :newMovement="newMovement"
       :dialog="dialog"
       @close="dialog = false"
     />
@@ -28,6 +27,7 @@
 
 <script>
 import Citas from "@/components/Citas.vue";
+const db = require("@/firebaseConfig.js");
 
 export default {
   name: "Appointments",
@@ -38,7 +38,6 @@ export default {
 
   data: () => ({
     appointment: {},
-    newMovement: false,
     dialog: false,
     value: "",
     route: ""
@@ -52,12 +51,20 @@ export default {
       this.$router.push("/appointments");
     },
 
-    sendData: function(appointment, newMovement) {
+    getData() {
+      db.citasCollection.get().then(q => {
+        q.forEach(doc => {
+          this.appointments_list.push(doc);
+          // console.log(`${doc.id} => ${doc.data()}`);
+        });
+      });
+    },
+    sendData: function(appointment) {
       this.appointment = {
         ...appointment
       };
       this.dialog = true;
-      this.newMovement = newMovement;
+      // this.getData();
     }
   },
 

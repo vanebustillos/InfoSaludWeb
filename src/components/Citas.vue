@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="dialog" persistent max-width="900px">
       <v-card class="spacing-playground pa-5" fluid>
-        <v-form ref="form" v-model="valid" lazy-validation>
+        <v-form ref="form">
           <v-card-title class="title">
             <v-row align="center" justify="center">
               <h2>{{ "Agendar Cita Médica" }}</h2></v-row
@@ -107,13 +107,13 @@
           <!-- <v-row align="center" justify="center"> -->
           <v-card-actions>
             <v-spacer></v-spacer>
-            <div>
+            <div v-if="_validateData()">
               <v-btn
                 depressed
                 large
                 color="#82c9eb"
                 class="white--text ma-2 "
-                v-if="newMovement"
+                v-if="_validateData()"
                 @click="addAppointment()"
                 >SAVE
                 <v-icon right dark>mdi-checkbox-marked-circle</v-icon>
@@ -141,25 +141,20 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
-// import { db } from "@/firebaseConfig.js";
-// const db = require("@/firebaseConfig.js");
+const db = require("@/firebaseConfig.js");
+// import * as firebase from 'firebase/app'
+// import { Observable } from "rxjs/Observable";
 
 export default {
   name: "Citas",
   data: () => ({
-    valid: false,
     now: new Date().toISOString().substr(0, 10),
     menu_date: false,
     showCurrent: true,
     menu_hour: false,
-    agenda: {}
+    appointments_list: []
   }),
   props: {
-    newMovement: {
-      type: Boolean,
-      default: false
-    },
     dialog: {
       type: Boolean,
       default: false
@@ -179,16 +174,26 @@ export default {
       }
     }
   },
-  computed: {
-    ...mapGetters(["getAppointments"]),
-    appointments_list() {
-      return this.getAppointments;
+  created: async function() {
+    let citasDB = [];
+    await db.citasCollection.get().then(q => {
+      q.forEach(doc => {
+        citasDB.push(doc);
+        // console.log(`${doc.id} => ${doc.data()}`);
+      });
+    });
+    if (citasDB === null) {
+      this.appointments_list = [];
+    } else {
+      citasDB.forEach(cita => {
+        this.appointments_list.push(cita);
+      });
     }
   },
+  computed: {},
   methods: {
-    ...mapActions(["setAppointment"]),
     cancel() {
-      // this.$emit("close");
+      this.$emit("close");
       this.appointment.id = "";
       this.appointment.clientName = "";
       this.appointment.clientSurnames = "";
@@ -197,30 +202,84 @@ export default {
       this.appointment.date = "";
       this.appointment.hour = "";
     },
-
-    addAppointment() {
-      this.setAppointment({
-        id: "cita-2",
-        clientName: this.appointment.clientName,
-        clientSurnames: this.appointment.clientSurnames,
-        clientCi: this.appointment.clientCi,
-        clientPhone: this.appointment.clientPhone,
-        date: this.appointment.date,
-        hour: this.appointment.hour
-      });
-      this.cancel();
-
-      alert("La cita ha sido guardada exitosamente");
+    // getData() {
+    // db.citasCollection.get().then(q => {
+    // q.forEach(doc => {
+    // this.appointments_list.push(doc);
+    // console.log(`${doc.id} => ${doc.data()}`);
+    // });
+    // });
+    // },
+    addAppointment: async function() {
+      if (this._validateData()) {
+        if (this._validateDateFormat(this.appointment.date)) {
+          await db.citasCollection.doc(this.getAppointmentId()).set({
+            id: this.getAppointmentId(),
+            clientName: this.appointment.clientName,
+            clientSurnames: this.appointment.clientSurnames,
+            clientCi: this.appointment.clientCi,
+            clientPhone: this.appointment.clientPhone,
+            date: this.appointment.date,
+            hour: this.appointment.hour
+          });
+          this.cancel();
+          alert("La cita ha sido guardada exitosamente");
+        } else {
+          alert(
+            "No puede asignar una cita para el dia " + this.appointment.date
+          );
+        }
+      } else {
+        alert("Debe completar todos los campos de la cita!.");
+      }
     },
+    // all() {
+    //   return Observable.create(function(observer) {
+    //     db.citasCollection.onSnapshot(snapshot => {
+    //       observer.next(snapshot.doc.map(docSnapshot => docSnapshot.data()));
+    //     });
+    //   });
+    // },
 
     getAppointmentId() {
+      // let appointments = this.getData().forEach(a => {
+      // for (var i = 0; i <= this.getData.length(); i++) {
+      // appointments[i] = a;
+      // }
+      // });
       let newId = 1;
-      let numberOfAppointments = this.getAppointments.length;
+      let numberOfAppointments = this.appointments_list.length;
       if (numberOfAppointments > 0) {
-        let lastId = this.getAppointments[numberOfAppointments - 1].id;
+        let lastId = this.appointments_list[numberOfAppointments - 1].id;
         newId = parseInt(lastId.split("-")[1]) + 1;
       }
       return "Cita-" + newId;
+    },
+
+    _validateData() {
+      return (
+        this.appointment.clientName !== "" &&
+        this.appointment.clientSurnames !== "" &&
+        this.appointment.clientCi !== "" &&
+        this.appointment.clientPhone !== "" &&
+        this.appointment.date !== "" &&
+        this.appointment.hour !== ""
+      );
+    },
+    _validateDateFormat(appointmentDate) {
+      //let now = new Date().toISOString().substr(0, 10);
+      let now = new Date();
+      let year = parseInt(now.getFullYear());
+      let day = parseInt(now.getDate());
+      let month = parseInt(now.getMonth() + 1);
+      //let hour = parseInt(now.getHours());
+      let app_date = appointmentDate.split("-");
+      //let app_hour = startHour.split(":");
+      return (
+        parseInt(app_date[0]) >= year &&
+        parseInt(app_date[1]) >= month &&
+        parseInt(app_date[2]) >= day
+      );
     }
   }
 };
