@@ -16,6 +16,8 @@
                     autocomplete="off"
                     v-model="appointment.clientName"
                     label="Nombre(s) :"
+                    :counter="50"
+                    :rules="rules.clientNameRules"
                     required
                   ></v-text-field>
                 </v-col>
@@ -24,6 +26,8 @@
                     autocomplete="off"
                     v-model="appointment.clientSurnames"
                     label="Apellidos :"
+                    :counter="60"
+                    :rules="rules.clientSurnameRules"
                     required
                   ></v-text-field>
                 </v-col>
@@ -32,6 +36,8 @@
                     autocomplete="off"
                     v-model="appointment.clientCi"
                     label="CI :"
+                    :counter="10"
+                    :rules="rules.clientCIRules"
                     required
                   ></v-text-field>
                 </v-col>
@@ -40,6 +46,8 @@
                     autocomplete="off"
                     v-model="appointment.clientPhone"
                     label="Teléfono de Referencia :"
+                    :counter="15"
+                    :rules="rules.clientPhoneRules"
                     required
                   ></v-text-field>
                 </v-col>
@@ -59,6 +67,8 @@
                         readonly
                         v-bind="attrs"
                         v-on="on"
+                        :rules="rules.dateRule"
+                        required
                       ></v-text-field>
                     </template>
                     <v-date-picker
@@ -67,7 +77,7 @@
                       color="#82c9eb"
                       :landscape="true"
                       class="mt-4"
-                      min="2020-06-10"
+                      min="2020-10-30"
                     ></v-date-picker>
                   </v-menu>
                 </v-col>
@@ -86,6 +96,7 @@
                         label="Hora :"
                         v-bind="attrs"
                         v-on="on"
+                        :rules="rules.dateRule"
                         readonly
                         required
                       ></v-text-field>
@@ -142,8 +153,6 @@
 
 <script>
 const db = require("@/firebaseConfig.js");
-// import * as firebase from 'firebase/app'
-// import { Observable } from "rxjs/Observable";
 
 export default {
   name: "Citas",
@@ -152,7 +161,47 @@ export default {
     menu_date: false,
     showCurrent: true,
     menu_hour: false,
-    appointments_list: []
+    appointments_list: [],
+    valid: true,
+    rules: {
+      clientNameRules: [
+        v => !!v || "Debe especificar el nombre para agendar la cita!",
+        v =>
+          (v && v.length <= 50) ||
+          "*Este campo no puede contener mas de 40 caracteres!",
+        v =>
+          (v && v.length >= 2) ||
+          "*Este campo debe contener al menos dos caracteres!"
+      ],
+      clientSurnameRules: [
+        v => !!v || "Debe especificar los apellidos para agendar la cita!",
+        v =>
+          (v && v.length <= 60) ||
+          "*Este campo no puede contener mas de 60 caracteres!",
+        v =>
+          (v && v.length >= 3) ||
+          "*Este campo debe contener al menos tres caracteres!"
+      ],
+      clientPhoneRules: [
+        v => !!v || "Debe especificar el Telefono de Referencia!",
+        v =>
+          (v && v.length >= 7) ||
+          "*El numero de telefono debe contener menos 7 caracteres!",
+        v =>
+          (v && v.length <= 15) ||
+          "*El numero de telefono no debe contener mas de 15 caracteres"
+      ],
+      clientCIRules: [
+        v => !!v || "Debe especificar el numero de Carnet de Identidad!",
+        v =>
+          (v && v.length >= 7) ||
+          "*El numero del CI debe contener menos 7 caracteres!",
+        v =>
+          (v && v.length <= 10) ||
+          "*El numero del CI no debe contener mas de 10 caracteres"
+      ],
+      dateRule: [v => !!v || "Este campo es requerido!"]
+    }
   }),
   props: {
     dialog: {
@@ -169,7 +218,8 @@ export default {
           clientCi: "",
           clientPhone: "",
           date: new Date().toISOString().substr(0, 10),
-          hour: ""
+          hour: "",
+          health_place: ""
         };
       }
     }
@@ -179,7 +229,7 @@ export default {
     await db.citasCollection.get().then(q => {
       q.forEach(doc => {
         citasDB.push(doc);
-        // console.log(`${doc.id} => ${doc.data()}`);
+        console.log(`${doc.id} => ${doc.data()}`);
       });
     });
     if (citasDB === null) {
@@ -201,15 +251,9 @@ export default {
       this.appointment.clientPhone = "";
       this.appointment.date = "";
       this.appointment.hour = "";
+      this.appointment.health_place = "";
     },
-    // getData() {
-    // db.citasCollection.get().then(q => {
-    // q.forEach(doc => {
-    // this.appointments_list.push(doc);
-    // console.log(`${doc.id} => ${doc.data()}`);
-    // });
-    // });
-    // },
+
     addAppointment: async function() {
       if (this._validateData()) {
         if (this._validateDateFormat(this.appointment.date)) {
@@ -220,7 +264,8 @@ export default {
             clientCi: this.appointment.clientCi,
             clientPhone: this.appointment.clientPhone,
             date: this.appointment.date,
-            hour: this.appointment.hour
+            hour: this.appointment.hour,
+            health_place: "C1"
           });
           this.cancel();
           alert("La cita ha sido guardada exitosamente");
@@ -233,20 +278,8 @@ export default {
         alert("Debe completar todos los campos de la cita!.");
       }
     },
-    // all() {
-    //   return Observable.create(function(observer) {
-    //     db.citasCollection.onSnapshot(snapshot => {
-    //       observer.next(snapshot.doc.map(docSnapshot => docSnapshot.data()));
-    //     });
-    //   });
-    // },
 
     getAppointmentId() {
-      // let appointments = this.getData().forEach(a => {
-      // for (var i = 0; i <= this.getData.length(); i++) {
-      // appointments[i] = a;
-      // }
-      // });
       let newId = 1;
       let numberOfAppointments = this.appointments_list.length;
       if (numberOfAppointments > 0) {
@@ -274,7 +307,6 @@ export default {
       let month = parseInt(now.getMonth() + 1);
       //let hour = parseInt(now.getHours());
       let app_date = appointmentDate.split("-");
-      //let app_hour = startHour.split(":");
       return (
         parseInt(app_date[0]) >= year &&
         parseInt(app_date[1]) >= month &&
