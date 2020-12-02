@@ -10,7 +10,7 @@ const routes = [
     component: Home
   },
   {
-    path: "/hospital",
+    path: "/hospitales",
     name: "Hospital",
     component: () =>
       import(/* webpackChunkName: "about" */ "../components/Hospital.vue")
@@ -21,6 +21,38 @@ const routes = [
     // component: CitasView
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/CitasView.vue")
+  },
+  {
+    path: "/clinicas",
+    name: "Clinicas",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Clinicas.vue")
+  },
+  {
+    path: "/medicos",
+    name: "Medicos",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Medicos.vue")
+  },
+  {
+    path: "/hospitalsInfo",
+    name: "HospitalsInfo",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/HospitalsInfo.vue")
+  },
+  {
+    path: "/clinicsInfo",
+    name: "ClinicsInfo",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/ClinicsInfo.vue")
+  },
+  {
+    path: "/independentDocsInfo",
+    name: "IndependentDocsInfo",
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ "../components/IndependentDocsInfo.vue"
+      )
   },
   {
     path: "/about",
