@@ -6,9 +6,7 @@
           <v-card class="pa-2" outlined tile>
             <v-list-item three-line>
               <v-list-item-avatar tile size="100" color="grey">
-                <v-img
-                  src="https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-1.jpg"
-                ></v-img>
+                <v-img :src="this.img"></v-img>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="headline">
@@ -62,7 +60,7 @@
                   <v-carousel-item
                     v-for="(item, i) in items"
                     :key="i"
-                    :src="item.src"
+                    :src="item"
                   >
                   </v-carousel-item>
                 </v-carousel>
@@ -117,8 +115,7 @@
                   Horarios de Atención
                 </v-list-item-title>
                 <v-divider></v-divider>
-                <v-list-item-subtitle v-for="hour in attention"
-                  :key="hour.id">
+                <v-list-item-subtitle v-for="hour in attention" :key="hour.id">
                   {{ hour }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-if="available">
@@ -163,34 +160,18 @@ export default {
       specialties: [],
       attention: [],
       available: Boolean,
-      items: [
-        {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-3.jpg",
-        },
-        {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas/blogos/dra-janneth-duran-la-fuente-logo.jpg",
-        },
-        {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-5.jpg",
-        },
-        {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-7.jpg",
-        },
-      ],
+      img: "",
+      items: [],
     };
   },
   computed: {},
   mounted() {
-    this.id=this._getId();
+    this.id = this._getId();
     this._retrieveData();
   },
   methods: {
     _getId() {
-        return this.$route.params.id;
+      return this.$route.params.id;
     },
     _retrieveData() {
       db.collection("medicosInd")
@@ -203,32 +184,7 @@ export default {
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
-          
-          let cont=0;
-          querySnapshot.data().attention.forEach((hour) => {
-            if (cont == 0){
-              this.attention.push("Lunes: "+hour);
-              cont++;
-            }else if (cont == 1){
-              this.attention.push("Martes: "+hour);
-              cont++;
-            }else if (cont == 2){
-              this.attention.push("Miércoles: "+hour);
-              cont++;
-            }else if (cont == 3){
-              this.attention.push("Jueves: "+hour);
-              cont++;
-            }else if (cont == 4){
-              this.attention.push("Viernes: "+hour);
-              cont++;
-            }else if (cont == 5){
-              this.attention.push("Sábado: "+hour);
-              cont++;
-            }else if (cont == 6){
-              this.attention.push("Domingo: "+hour);
-              cont=0;
-            }
-          });
+          this.img = querySnapshot.data().img;
 
           querySnapshot.data().phones.forEach((phone) => {
             if (this.telephones == "") {
@@ -237,13 +193,57 @@ export default {
               this.telephones = this.telephones + " - " + phone;
             }
           });
-          querySnapshot.data().specialties.forEach((specialty) => {
-            this.specialties.push(specialty);
-          });
+
           if (querySnapshot.data().availability) this.available = true;
           else this.available = false;
+
+          this._getAttention(querySnapshot.data().attention);
+          this._getSpecialties(querySnapshot.data().specialties);
+          this._getImages(querySnapshot.data().carrousel);
         });
     },
+    _getAttention(attentionArray) {
+      let cont = 0;
+      attentionArray.forEach((hour) => {
+        if (cont == 0) {
+          this.attention.push("Lunes: " + hour);
+          cont++;
+        } else if (cont == 1) {
+          this.attention.push("Martes: " + hour);
+          cont++;
+        } else if (cont == 2) {
+          this.attention.push("Miércoles: " + hour);
+          cont++;
+        } else if (cont == 3) {
+          this.attention.push("Jueves: " + hour);
+          cont++;
+        } else if (cont == 4) {
+          this.attention.push("Viernes: " + hour);
+          cont++;
+        } else if (cont == 5) {
+          this.attention.push("Sábado: " + hour);
+          cont++;
+        } else if (cont == 6) {
+          this.attention.push("Domingo: " + hour);
+          cont = 0;
+        }
+      });
+    },
+    _getSpecialties(specialtiesArray) {
+      specialtiesArray.forEach((specialty) => {
+        db.collection("especialidades")
+          .doc(specialty)
+          .get()
+          .then((querySnapshot) => {
+            this.specialties.push(querySnapshot.data().name);
+          });
+      });
+    },
+    _getImages(imagesArray) {
+      imagesArray.forEach((image) => {
+        this.items.push(image);
+      });
+    }
   },
 };
 </script>
