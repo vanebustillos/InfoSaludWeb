@@ -64,6 +64,7 @@ export default {
             this.hospitals.push(doc.data());
           });
         });
+
     }
   }
 };

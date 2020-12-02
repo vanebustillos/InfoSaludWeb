@@ -50,6 +50,9 @@ export default new Vuex.Store({
     }
   },
   getters: {
+    getHospitals(state) {
+      return state.hospitales;
+    },
     getHospitalsData(state) {
       return state.hospitals;
     }
