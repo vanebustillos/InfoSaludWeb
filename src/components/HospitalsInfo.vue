@@ -139,8 +139,7 @@
                   Horarios de Atención
                 </v-list-item-title>
                 <v-divider></v-divider>
-                <v-list-item-subtitle v-for="hour in attention"
-                  :key="hour.id">
+                <v-list-item-subtitle v-for="hour in attention" :key="hour.id">
                   {{ hour }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle v-if="available">
@@ -152,9 +151,15 @@
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
-              <v-btn rounded block outlined v-if="available"
-                >Agedar una cita</v-btn
+              <v-btn
+                rounded
+                block
+                outlined
+                v-if="available"
+                v-on:click="sendData(appointment, 'H2')"
               >
+                Agedar una cita
+              </v-btn>
               <v-btn rounded block outlined disabled v-else
                 >Agedar una cita</v-btn
               >
@@ -163,15 +168,23 @@
         </v-col>
       </v-row>
     </v-container>
+    <Citas
+      :appointment="appointment"
+      :dialog="dialog"
+      :value="value"
+      @close="dialog = false"
+    />
   </div>
 </template>
 
 <script>
+import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
+
 export default {
   name: "HospitalsInfo",
   components: {
-    // HelloWorld
+    Citas
   },
 
   data() {
@@ -186,6 +199,9 @@ export default {
       services: [],
       attention: [],
       available: Boolean,
+      appointment: {},
+      dialog: false,
+      value: "",
       items: [
         {
           src: "https://www.marcelovaldivia.com/img/univalle.png",
@@ -198,8 +214,8 @@ export default {
         },
         {
           src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE3XrQjTWLHlKeQHjkuqbpwzAlXbIzy87sFA&usqp=CAU",
-        },
-      ],
+        }
+      ]
     };
   },
   computed: {},
@@ -207,6 +223,14 @@ export default {
     this._retrieveData();
   },
   methods: {
+    sendData: function(appointment, value) {
+      this.appointment = {
+        ...appointment
+      };
+      this.dialog = true;
+      this.value = value;
+    },
+
     _retrieveData() {
       db.collection("hospitales")
         .doc("H2")
@@ -259,7 +283,7 @@ export default {
           if (querySnapshot.data().availability) this.available = true;
           else this.available = false;
         });
-    },
-  },
+    }
+  }
 };
 </script>
