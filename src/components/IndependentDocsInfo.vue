@@ -130,9 +130,15 @@
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
-              <v-btn rounded block outlined v-if="available"
-                >Agedar una cita</v-btn
+              <v-btn
+                rounded
+                block
+                outlined
+                v-if="available"
+                v-on:click="sendData(appointment, 'MI1')"
               >
+                Agedar una cita
+              </v-btn>
               <v-btn rounded block outlined disabled v-else
                 >Agedar una cita</v-btn
               >
@@ -141,15 +147,23 @@
         </v-col>
       </v-row>
     </v-container>
+    <Citas
+      :appointment="appointment"
+      :dialog="dialog"
+      :value="value"
+      @close="dialog = false"
+    />
   </div>
 </template>
 
 <script>
+import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
+
 export default {
   name: "HospitalsInfo",
   components: {
-    // HelloWorld
+    Citas
   },
 
   data() {
@@ -162,6 +176,9 @@ export default {
       specialties: [],
       attention: [],
       available: Boolean,
+      appointment: {},
+      dialog: false,
+      value: "",
       items: [
         {
           src:
@@ -178,8 +195,8 @@ export default {
         {
           src:
             "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-7.jpg",
-        },
-      ],
+        }
+      ]
     };
   },
   computed: {},
@@ -187,6 +204,14 @@ export default {
     this._retrieveData();
   },
   methods: {
+    sendData: function(appointment, value) {
+      this.appointment = {
+        ...appointment
+      };
+      this.dialog = true;
+      this.value = value;
+    },
+
     _retrieveData() {
       db.collection("medicosInd")
         .doc("MI1")
@@ -198,7 +223,7 @@ export default {
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
-          
+
           let cont=0;
           querySnapshot.data().attention.forEach((hour) => {
             if (cont == 0){
@@ -238,7 +263,7 @@ export default {
           if (querySnapshot.data().availability) this.available = true;
           else this.available = false;
         });
-    },
-  },
+    }
+  }
 };
 </script>

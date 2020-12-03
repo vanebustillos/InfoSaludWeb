@@ -151,9 +151,15 @@
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
-              <v-btn rounded block outlined v-if="available"
-                >Agedar una cita</v-btn
+              <v-btn
+                rounded
+                block
+                outlined
+                v-if="available"
+                v-on:click="sendData(appointment, 'C1')"
               >
+                Agedar una cita
+              </v-btn>
               <v-btn rounded block outlined disabled v-else
                 >Agedar una cita</v-btn
               >
@@ -162,15 +168,23 @@
         </v-col>
       </v-row>
     </v-container>
+    <Citas
+      :appointment="appointment"
+      :dialog="dialog"
+      :value="value"
+      @close="dialog = false"
+    />
   </div>
 </template>
 
 <script>
+import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
+
 export default {
   name: "HospitalsInfo",
   components: {
-    // HelloWorld
+    Citas
   },
 
   data() {
@@ -185,6 +199,9 @@ export default {
       services: [],
       attention: [],
       available: Boolean,
+      appointment: {},
+      dialog: false,
+      value: "",
       items: [
         {
           src:
@@ -201,8 +218,8 @@ export default {
         {
           src:
             "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/clinica_los_angeles_1.jpg"
-        },
-      ],
+        }
+      ]
     };
   },
   computed: {},
@@ -210,6 +227,14 @@ export default {
     this._retrieveData();
   },
   methods: {
+    sendData: function(appointment, value) {
+      this.appointment = {
+        ...appointment
+      };
+      this.dialog = true;
+      this.value = value;
+    },
+
     _retrieveData() {
       db.collection("clinicas")
         .doc("C1")
@@ -263,7 +288,7 @@ export default {
           if (querySnapshot.data().availability) this.available = true;
           else this.available = false;
         });
-    },
-  },
+    }
+  }
 };
 </script>
