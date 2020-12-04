@@ -79,9 +79,20 @@
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-list-item-avatar tile height="253" width="500" color="grey">
-                  <v-img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU"
-                  ></v-img>
+                  <!-- <v-img -->
+                  <!-- src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU" -->
+                  <!-- ></v-img> -->
+                  <gmaps-map :options="mapOptions">
+                    <gmaps-marker
+                      :key="index"
+                      v-for="(m, index) in markers"
+                      :position="m.position"
+                      :title="m.title"
+                      :clickable="true"
+                      :draggable="true"
+                      @click="center = m.position"
+                    ></gmaps-marker>
+                  </gmaps-map>
                 </v-list-item-avatar>
               </v-list-item-content>
             </v-list-item>
@@ -159,11 +170,14 @@
 <script>
 import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
+import { gmapsMap, gmapsMarker } from "x5-gmaps";
 
 export default {
   name: "HospitalsInfo",
   components: {
-    Citas
+    Citas,
+    gmapsMap,
+    gmapsMarker
   },
 
   data() {
@@ -179,6 +193,20 @@ export default {
       appointment: {},
       dialog: false,
       value: "",
+      lat: Number,
+      lng: Number,
+      markers: [
+        {
+          //position: { lat: this.lat, lng: this.lng },
+          position: { lat: -17.377195905887, lng: -66.156870748678 },
+          title: this.name
+        }
+      ],
+      mapOptions: {
+        // center: { lat: this.lat, lng: this.lng },
+        center: { lat: -17.377195905887, lng: -66.156870748678 },
+        zoom: 18
+      },
       items: [
         {
           src:
@@ -223,6 +251,9 @@ export default {
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
+          this.lat = querySnapshot.data().position.lat;
+          this.lng = querySnapshot.data().position.lng;
+          console.log("Position: " + this.lat + " , " + this.lng);
 
           let cont=0;
           querySnapshot.data().attention.forEach((hour) => {
