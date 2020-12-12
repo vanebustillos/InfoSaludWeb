@@ -15,8 +15,8 @@
         </v-col>
         <v-col class="d-flex" cols="12" sm="4">
           <v-select
-            :items="especialties"
-            v-model="selectedEspecialty"
+            :items="specialties"
+            v-model="selectedSpecialty"
             item-text="name"
             label="Especialidades"
             outlined
@@ -24,31 +24,38 @@
           ></v-select>
         </v-col>
         <v-col class="d-flex" cols="12" sm="2">
-          <v-btn img color="primary" i:hover fab>
+          <v-btn
+            img
+            color="primary"
+            i:hover
+            fab
+            v-if="selectedRegion && selectedSpecialty"
+            @click="filterData()"
+          >
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-col>
       </v-row>
     </v-container>
     <v-container>
-      <v-row v-for="(clinica, index) in clinicas" :key="index">
+      <v-row v-for="(clinic, index) in filteredData" :key="index">
         <v-col class="mx-auto" cols="12" md="7">
           <v-card tile hover color="#F6F6F6">
             <v-list-item three-line>
               <v-list-item-avatar tile size="100" color="#FFFFFF">
-                <v-img :src="clinica.img"></v-img>
+                <v-img :src="clinic.img"></v-img>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="headline">
-                  {{ clinica.name }}
+                  {{ clinic.name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   <v-icon> mdi-map-marker </v-icon>
-                  {{ clinica.location }}
+                  {{ clinic.location }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle>
                   <v-icon> mdi-phone </v-icon>
-                  {{ clinica.phones }}
+                  {{ clinic.phones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-btn
@@ -56,7 +63,7 @@
                 id="info"
                 :rounded="true"
                 color="#D6DBDF"
-                @click.stop="openInfoDialog(clinica.id)"
+                @click.stop="openInfoDialog(clinic.id)"
                 >Ver más</v-btn
               >
             </v-list-item>
@@ -72,23 +79,31 @@ import { db } from "@/firebaseConfig.js";
 export default {
   data() {
     return {
-      clinicas: [],
-      especialties: [],
-      selectedRegion: null,
-      selectedEspecialty: "",
-      regions: ["Cercado", "Colcapirhua", "Tiquipaya", "Quillacollo", "Sacaba"]
+      clinics: [],
+      specialties: [],
+      selectedRegion: "",
+      selectedSpecialty: "",
+      regions: [
+        "Zona Norte",
+        "Colcapirhua",
+        "Tiquipaya",
+        "Quillacollo",
+        "Sacaba",
+        "Zona Sud"
+      ],
+      filteredData: []
     };
   },
   created() {
-    this._getclinicas();
-    this._getEspecialties();
+    this._getClinics();
+    this._getSpecialties();
   },
   computed: {
-    ...mapGetters(["getclinicasData"])
+    ...mapGetters(["getclinicsData"])
   },
   methods: {
-    ...mapActions(["getclinicas"]),
-    _getclinicas() {
+    ...mapActions(["getclinics"]),
+    _getClinics() {
       db.collection("clinicas")
         .limit(2)
         .orderBy("id")
@@ -97,18 +112,40 @@ export default {
           //Get the last element
           this.last = querySnapshot.docs[querySnapshot.docs.length - 1];
           querySnapshot.forEach(doc => {
-            this.clinicas.push(doc.data());
+            this.clinics.push(doc.data());
+            this.filteredData.push(doc.data());
           });
         });
     },
-    _getEspecialties() {
+    _getSpecialties() {
       db.collection("especialidades")
         .limit(2)
         .orderBy("name")
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
-            this.especialties.push(doc.data());
+            this.specialties.push(doc.data());
+          });
+        });
+    },
+    filterData() {
+      this.filteredData = [];
+      db.collection("especialidades")
+        .orderBy("name")
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            if (doc.data().name === this.selectedSpecialty) {
+              this.clinics.forEach(clinic => {
+                if (
+                  clinic.specialties.includes(doc.id) &&
+                  //doc.data().establishments.includes(clinic.id);
+                  clinic.region === this.selectedRegion
+                )
+                  this.filteredData.push(clinic);
+              });
+              return;
+            }
           });
         });
     }
