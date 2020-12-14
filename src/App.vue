@@ -22,30 +22,25 @@
       </div>
       <v-spacer></v-spacer>
       <div>
-        <router-link to="/hospitales" tag="v-btn">
-          <v-btn icon>
-            <v-icon>mdi-hospital-building</v-icon>
-            <label>hospitales</label>
-          </v-btn>
-        </router-link>
+        <v-btn icon @click="hospital()">
+          <v-icon>mdi-hospital-building</v-icon>
+          <label>hospitales</label>
+        </v-btn>
+        <!-- </router-link> -->
       </div>
       <v-spacer></v-spacer>
       <div>
-        <router-link to="/clinicas" tag="v-btn">
-          <v-btn icon>
-            <v-icon>mdi-hospital</v-icon>
-            <label>clínicas</label>
-          </v-btn>
-        </router-link>
+        <v-btn icon @click="clinicas()">
+          <v-icon>mdi-hospital</v-icon>
+          <label>clínicas</label>
+        </v-btn>
       </div>
       <v-spacer></v-spacer>
       <div>
-        <router-link to="/medicos" tag="v-btn">
-          <v-btn icon>
-            <v-icon>mdi-doctor</v-icon>
-            <label>médicos</label>
-          </v-btn>
-        </router-link>
+        <v-btn icon @click="medicos()">
+          <v-icon>mdi-doctor</v-icon>
+          <label>médicos</label>
+        </v-btn>
       </div>
       <v-spacer></v-spacer>
       <div>
@@ -76,6 +71,15 @@ export default {
   methods: {
     home() {
       this.$router.push("/").catch(() => {});
+    },
+    hospital() {
+      this.$router.push("/hospitales").catch(() => {});
+    },
+    clinicas() {
+      this.$router.push("/clinicas").catch(() => {});
+    },
+    medicos() {
+      this.$router.push("/medicos").catch(() => {});
     }
   }
 };

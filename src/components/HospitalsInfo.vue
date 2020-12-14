@@ -81,9 +81,20 @@
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-list-item-avatar tile height="253" width="500" color="grey">
-                  <v-img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU"
-                  ></v-img>
+                  <!-- <v-img -->
+                  <!-- src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU" -->
+                  <!-- ></v-img> -->
+                  <gmaps-map :options="mapOptions">
+                    <gmaps-marker
+                      :key="index"
+                      v-for="(m, index) in markers"
+                      :position="m.position"
+                      :title="m.title"
+                      :clickable="true"
+                      :draggable="true"
+                      @click="center = m.position"
+                    ></gmaps-marker>
+                  </gmaps-map>
                 </v-list-item-avatar>
               </v-list-item-content>
             </v-list-item>
@@ -149,9 +160,15 @@
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
-              <v-btn rounded block outlined v-if="available"
-                >Agedar una cita</v-btn
+              <v-btn
+                rounded
+                block
+                outlined
+                v-if="available"
+                v-on:click="sendData(appointment, 'H2')"
               >
+                Agedar una cita
+              </v-btn>
               <v-btn rounded block outlined disabled v-else
                 >Agedar una cita</v-btn
               >
@@ -160,15 +177,26 @@
         </v-col>
       </v-row>
     </v-container>
+    <Citas
+      :appointment="appointment"
+      :dialog="dialog"
+      :value="value"
+      @close="dialog = false"
+    />
   </div>
 </template>
 
 <script>
+import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
+import { gmapsMap, gmapsMarker } from "x5-gmaps";
+
 export default {
   name: "HospitalsInfo",
   components: {
-    // HelloWorld
+    Citas,
+    gmapsMap,
+    gmapsMarker
   },
 
   data() {
@@ -186,6 +214,23 @@ export default {
       available: Boolean,
       img: "",
       items: [],
+      appointment: {},
+      dialog: false,
+      value: "",
+      lat: Number,
+      lng: Number,
+      markers: [
+        {
+          //position: { lat: this.lat, lng: this.lng },
+          position: { lat: -17.37155059512898, lng: -66.16109964427892 },
+          title: this.name
+        }
+      ],
+      mapOptions: {
+        // center: { lat: this.lat, lng: this.lng },
+        center: { lat: -17.37155059512898, lng: -66.16109964427892 },
+        zoom: 16
+      },
     };
   },
   computed: {},
@@ -194,9 +239,19 @@ export default {
     this._retrieveData();
   },
   methods: {
+  
     _getId() {
       return this.$route.params.id;
     },
+    
+    sendData: function(appointment, value) {
+      this.appointment = {
+        ...appointment
+      };
+      this.dialog = true;
+      this.value = value;
+    },
+    
     _retrieveData() {
       db.collection("hospitales")
         .doc(this.id)
@@ -208,6 +263,9 @@ export default {
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
           this.img = querySnapshot.data().img;
+          this.lat = querySnapshot.data().position.lat;
+          this.lng = querySnapshot.data().position.lng;
+          console.log("Position: " + this.lat + " , " + this.lng);
 
           querySnapshot.data().phones.forEach((phone) => {
             if (this.telephones == "") {
@@ -226,6 +284,7 @@ export default {
           this._getImages(querySnapshot.data().carrousel);
         });
     },
+    
     _getAttention(attentionArray) {
       let cont = 0;
       attentionArray.forEach((hour) => {
@@ -253,6 +312,7 @@ export default {
         }
       });
     },
+    
     _getSpecialties(specialtiesArray) {
       specialtiesArray.forEach((specialty) => {
         db.collection("especialidades")
@@ -263,6 +323,7 @@ export default {
           });
       });
     },
+    
     _getServices(servicesArray) {
       servicesArray.forEach((service) => {
         db.collection("servicios")
@@ -273,6 +334,7 @@ export default {
           });
       });
     },
+    
     _getImages(imagesArray) {
       imagesArray.forEach((image) => {
         this.items.push(image);
