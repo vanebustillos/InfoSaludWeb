@@ -60,14 +60,13 @@
               </v-list-item-content>
               <router-link :to="{
                 name: 'ClinicsInfo',
-                params: { id: clinica.id }
+                params: { id: clinic.id }
               }">
                 <v-btn
                 class="ma-2"
                 id="info"
                 :rounded="true"
                 color="#D6DBDF"
-                @click.stop="openInfoDialog(clinic.id)"
                 >Ver más</v-btn
               >
               </router-link>

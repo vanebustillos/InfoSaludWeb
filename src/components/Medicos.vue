@@ -57,7 +57,6 @@
                 id="info"
                 :rounded="true"
                 color="#D6DBDF"
-                @click.stop="openInfoDialog(medico.id)"
                 >Ver más</v-btn
               >
               </router-link>
