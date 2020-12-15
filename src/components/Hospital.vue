@@ -58,7 +58,11 @@
                   {{ hospital.phones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-btn
+              <router-link :to="{
+                name: 'HospitalsInfo',
+                params: { id: hospital.id }
+              }">
+                <v-btn
                 class="ma-2"
                 id="info"
                 :rounded="true"
@@ -66,6 +70,7 @@
                 @click.stop="openInfoDialog(hospital.id)"
                 >Ver más</v-btn
               >
+              </router-link>
             </v-list-item>
           </v-card>
         </v-col>
@@ -77,6 +82,8 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { db } from "@/firebaseConfig.js";
+import router from "@/router/index.js";
+
 export default {
   data() {
     return {
@@ -95,6 +102,7 @@ export default {
       filteredData: []
     };
   },
+  router,
   created() {
     this._getHospitales();
     this._getspecialties();

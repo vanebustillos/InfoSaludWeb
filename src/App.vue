@@ -26,6 +26,7 @@
           <v-icon>mdi-hospital-building</v-icon>
           <label>hospitales</label>
         </v-btn>
+        <!-- </router-link> -->
       </div>
       <v-spacer></v-spacer>
       <div>

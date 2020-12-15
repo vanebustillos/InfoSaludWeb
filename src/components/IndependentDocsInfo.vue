@@ -6,9 +6,7 @@
           <v-card class="pa-2" outlined tile>
             <v-list-item three-line>
               <v-list-item-avatar tile size="100" color="grey">
-                <v-img
-                  src="https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-1.jpg"
-                ></v-img>
+                <v-img :src="this.img"></v-img>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="headline">
@@ -62,7 +60,7 @@
                   <v-carousel-item
                     v-for="(item, i) in items"
                     :key="i"
-                    :src="item.src"
+                    :src="item"
                   >
                   </v-carousel-item>
                 </v-carousel>
@@ -79,9 +77,20 @@
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-list-item-avatar tile height="253" width="500" color="grey">
-                  <v-img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU"
-                  ></v-img>
+                  <!-- <v-img -->
+                  <!-- src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU" -->
+                  <!-- ></v-img> -->
+                  <gmaps-map :options="mapOptions">
+                    <gmaps-marker
+                      :key="index"
+                      v-for="(m, index) in markers"
+                      :position="m.position"
+                      :title="m.title"
+                      :clickable="true"
+                      :draggable="true"
+                      @click="center = m.position"
+                    ></gmaps-marker>
+                  </gmaps-map>
                 </v-list-item-avatar>
               </v-list-item-content>
             </v-list-item>
@@ -129,9 +138,15 @@
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
-              <v-btn rounded block outlined v-if="available"
-                >Agedar una cita</v-btn
+              <v-btn
+                rounded
+                block
+                outlined
+                v-if="available"
+                v-on:click="sendData(appointment, 'MI1')"
               >
+                Agedar una cita
+              </v-btn>
               <v-btn rounded block outlined disabled v-else
                 >Agedar una cita</v-btn
               >
@@ -140,19 +155,31 @@
         </v-col>
       </v-row>
     </v-container>
+    <Citas
+      :appointment="appointment"
+      :dialog="dialog"
+      :value="value"
+      @close="dialog = false"
+    />
   </div>
 </template>
 
 <script>
+import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
+import { gmapsMap, gmapsMarker } from "x5-gmaps";
+
 export default {
   name: "HospitalsInfo",
   components: {
-    // HelloWorld
+    Citas,
+    gmapsMap,
+    gmapsMarker
   },
 
   data() {
     return {
+      id: "",
       name: "",
       address: "",
       telephones: "",
@@ -161,34 +188,48 @@ export default {
       specialties: [],
       attention: [],
       available: Boolean,
-      items: [
+      img: "",
+      items: [],
+      appointment: {},
+      dialog: false,
+      value: "",
+      lat: Number,
+      lng: Number,
+      markers: [
         {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-3.jpg"
-        },
-        {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas/blogos/dra-janneth-duran-la-fuente-logo.jpg"
-        },
-        {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-5.jpg"
-        },
-        {
-          src:
-            "https://www.boliviaentusmanos.com/amarillas1/businesscard/imagenes/dra-janneth-duran-la-fuente-7.jpg"
+          //position: { lat: this.lat, lng: this.lng },
+          position: { lat: -17.377195905887, lng: -66.156870748678 },
+          title: this.name
         }
-      ]
+      ],
+      mapOptions: {
+        // center: { lat: this.lat, lng: this.lng },
+        center: { lat: -17.377195905887, lng: -66.156870748678 },
+        zoom: 18
+      }
     };
   },
   computed: {},
   mounted() {
+    this.id = this._getId();
     this._retrieveData();
   },
   methods: {
+    _getId() {
+      return this.$route.params.id;
+    },
+    
+    sendData: function(appointment, value) {
+      this.appointment = {
+        ...appointment
+      };
+      this.dialog = true;
+      this.value = value;
+    },
+    
     _retrieveData() {
       db.collection("medicosInd")
-        .doc("MI1")
+        .doc(this.id)
         .get()
         .then(querySnapshot => {
           this.name =
@@ -197,10 +238,15 @@ export default {
           this.web = querySnapshot.data().webpage;
           this.email = querySnapshot.data().email;
           this.facebook = querySnapshot.data().facebook;
-          let cont = 0;
-          querySnapshot.data().attention.forEach(hour => {
-            if (cont == 0) {
-              this.attention.push("Lunes: " + hour);
+          this.img = querySnapshot.data().img;
+          this.lat = querySnapshot.data().position.lat;
+          this.lng = querySnapshot.data().position.lng;
+          console.log("Position: " + this.lat + " , " + this.lng);
+
+          let cont=0;
+          querySnapshot.data().attention.forEach((hour) => {
+            if (cont == 0){
+              this.attention.push("Lunes: "+hour);
               cont++;
             } else if (cont == 1) {
               this.attention.push("Martes: " + hour);
@@ -230,13 +276,60 @@ export default {
               this.telephones = this.telephones + " - " + phone;
             }
           });
-          querySnapshot.data().specialties.forEach(specialty => {
-            this.specialties.push(specialty);
-          });
+
           if (querySnapshot.data().availability) this.available = true;
           else this.available = false;
+
+          this._getAttention(querySnapshot.data().attention);
+          this._getSpecialties(querySnapshot.data().specialties);
+          this._getImages(querySnapshot.data().carrousel);
         });
+    },
+    
+    _getAttention(attentionArray) {
+      let cont = 0;
+      attentionArray.forEach((hour) => {
+        if (cont == 0) {
+          this.attention.push("Lunes: " + hour);
+          cont++;
+        } else if (cont == 1) {
+          this.attention.push("Martes: " + hour);
+          cont++;
+        } else if (cont == 2) {
+          this.attention.push("Miércoles: " + hour);
+          cont++;
+        } else if (cont == 3) {
+          this.attention.push("Jueves: " + hour);
+          cont++;
+        } else if (cont == 4) {
+          this.attention.push("Viernes: " + hour);
+          cont++;
+        } else if (cont == 5) {
+          this.attention.push("Sábado: " + hour);
+          cont++;
+        } else if (cont == 6) {
+          this.attention.push("Domingo: " + hour);
+          cont = 0;
+        }
+      });
+    },
+    
+    _getSpecialties(specialtiesArray) {
+      specialtiesArray.forEach((specialty) => {
+        db.collection("especialidades")
+          .doc(specialty)
+          .get()
+          .then((querySnapshot) => {
+            this.specialties.push(querySnapshot.data().name);
+          });
+      });
+    },
+    
+    _getImages(imagesArray) {
+      imagesArray.forEach((image) => {
+        this.items.push(image);
+      });
     }
-  }
+  },
 };
 </script>

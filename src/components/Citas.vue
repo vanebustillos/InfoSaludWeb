@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" persistent max-width="900px">
+    <v-dialog v-model="dialog" persistent max-width="800px">
       <v-card class="spacing-playground pa-5" fluid>
         <v-form ref="form">
           <v-card-title class="title">
@@ -208,6 +208,9 @@ export default {
       type: Boolean,
       default: false
     },
+    value: {
+      type: String
+    },
     appointment: {
       type: Object,
       default: function() {
@@ -265,7 +268,7 @@ export default {
             clientPhone: this.appointment.clientPhone,
             date: this.appointment.date,
             hour: this.appointment.hour,
-            health_place: "C1"
+            health_place: this.value
           });
           this.cancel();
           alert("La cita ha sido guardada exitosamente");
@@ -288,6 +291,9 @@ export default {
       }
       return "Cita-" + newId;
     },
+    _getRouterId() {
+      return this.$route.params.id;
+    },
 
     _validateData() {
       return (
@@ -299,6 +305,7 @@ export default {
         this.appointment.hour !== ""
       );
     },
+
     _validateDateFormat(appointmentDate) {
       //let now = new Date().toISOString().substr(0, 10);
       let now = new Date();
