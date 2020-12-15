@@ -49,7 +49,7 @@
         </v-btn>
       </div>
     </v-app-bar>
-    <v-main class="background">
+    <v-main>
       <router-view />
     </v-main>
   </v-app>

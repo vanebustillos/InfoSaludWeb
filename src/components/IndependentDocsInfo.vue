@@ -206,7 +206,7 @@ export default {
         // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.377195905887, lng: -66.156870748678 },
         zoom: 18
-      },
+      }
     };
   },
   computed: {},
@@ -231,7 +231,7 @@ export default {
       db.collection("medicosInd")
         .doc(this.id)
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.name =
             querySnapshot.data().name + " " + querySnapshot.data().lastname;
           this.address = querySnapshot.data().location;
@@ -248,28 +248,28 @@ export default {
             if (cont == 0){
               this.attention.push("Lunes: "+hour);
               cont++;
-            }else if (cont == 1){
-              this.attention.push("Martes: "+hour);
+            } else if (cont == 1) {
+              this.attention.push("Martes: " + hour);
               cont++;
-            }else if (cont == 2){
-              this.attention.push("Miércoles: "+hour);
+            } else if (cont == 2) {
+              this.attention.push("Miércoles: " + hour);
               cont++;
-            }else if (cont == 3){
-              this.attention.push("Jueves: "+hour);
+            } else if (cont == 3) {
+              this.attention.push("Jueves: " + hour);
               cont++;
-            }else if (cont == 4){
-              this.attention.push("Viernes: "+hour);
+            } else if (cont == 4) {
+              this.attention.push("Viernes: " + hour);
               cont++;
-            }else if (cont == 5){
-              this.attention.push("Sábado: "+hour);
+            } else if (cont == 5) {
+              this.attention.push("Sábado: " + hour);
               cont++;
-            }else if (cont == 6){
-              this.attention.push("Domingo: "+hour);
-              cont=0;
+            } else if (cont == 6) {
+              this.attention.push("Domingo: " + hour);
+              cont = 0;
             }
           });
 
-          querySnapshot.data().phones.forEach((phone) => {
+          querySnapshot.data().phones.forEach(phone => {
             if (this.telephones == "") {
               this.telephones = phone;
             } else {
