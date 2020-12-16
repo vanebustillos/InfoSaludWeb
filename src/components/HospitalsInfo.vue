@@ -172,6 +172,48 @@
             </v-card-actions>
           </v-card>
         </v-col>
+        <v-col cols="12" md="8">
+          <v-card class="pa-2" outlined tile>
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="headline">
+                  Comentarios
+                </v-list-item-title>
+                <v-divider></v-divider>
+              </v-list-item-content>
+            </v-list-item>
+          </v-card>
+        </v-col>
+        <v-col cols="6" md="4">
+          <v-card class="pa-2" outlined tile>
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="headline">
+                  Dar puntuación a {{ name }}
+                </v-list-item-title>
+                <v-divider></v-divider>
+                <v-card-actions class="pa-4">
+                  <v-spacer></v-spacer>
+                  <span> ({{ rating }}) </span>
+                  <v-rating
+                    v-model="rating"
+                    background-color="yellow accent-4"
+                    color="yellow accent-4"
+                    dense
+                    half-increments
+                    hover
+                    size="30"
+                  ></v-rating>
+                  <v-spacer></v-spacer>
+                  <v-btn rounded outlined>
+                    Puntuar
+                  </v-btn>
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-list-item-content>
+            </v-list-item>
+          </v-card>
+        </v-col>
       </v-row>
     </v-container>
     <Citas
@@ -193,7 +235,7 @@ export default {
   components: {
     Citas,
     gmapsMap,
-    gmapsMarker,
+    gmapsMarker
   },
 
   data() {
@@ -220,14 +262,15 @@ export default {
         {
           //position: { lat: this.lat, lng: this.lng },
           position: { lat: -17.37155059512898, lng: -66.16109964427892 },
-          title: this.name,
-        },
+          title: this.name
+        }
       ],
       mapOptions: {
         // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.37155059512898, lng: -66.16109964427892 },
-        zoom: 16,
+        zoom: 16
       },
+      rating: 0
     };
   },
   computed: {},
@@ -240,9 +283,9 @@ export default {
       return this.$route.params.id;
     },
 
-    sendData: function (appointment, value) {
+    sendData: function(appointment, value) {
       this.appointment = {
-        ...appointment,
+        ...appointment
       };
       this.dialog = true;
       this.value = value;
@@ -252,7 +295,7 @@ export default {
       db.collection("hospitales")
         .doc(this.id)
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.name = querySnapshot.data().name;
           this.address = querySnapshot.data().location;
           this.web = querySnapshot.data().webpage;
@@ -263,7 +306,7 @@ export default {
           this.lng = querySnapshot.data().position.lng;
           console.log("Position: " + this.lat + " , " + this.lng);
 
-          querySnapshot.data().phones.forEach((phone) => {
+          querySnapshot.data().phones.forEach(phone => {
             if (this.telephones == "") {
               this.telephones = phone;
             } else {
@@ -283,7 +326,7 @@ export default {
 
     _getAttention(attentionArray) {
       let cont = 0;
-      attentionArray.forEach((hour) => {
+      attentionArray.forEach(hour => {
         if (cont == 0) {
           this.attention.push("Lunes: " + hour);
           cont++;
@@ -310,11 +353,11 @@ export default {
     },
 
     _getSpecialties(specialtiesArray) {
-      specialtiesArray.forEach((specialty) => {
+      specialtiesArray.forEach(specialty => {
         db.collection("especialidades")
           .doc(specialty)
           .get()
-          .then((querySnapshot) => {
+          .then(querySnapshot => {
             if (querySnapshot.data() != null) {
               this.specialties.push(querySnapshot.data().name);
             }
@@ -323,21 +366,21 @@ export default {
     },
 
     _getServices(servicesArray) {
-      servicesArray.forEach((service) => {
+      servicesArray.forEach(service => {
         db.collection("servicios")
           .doc(service)
           .get()
-          .then((querySnapshot) => {
+          .then(querySnapshot => {
             this.services.push(querySnapshot.data().name);
           });
       });
     },
 
     _getImages(imagesArray) {
-      imagesArray.forEach((image) => {
+      imagesArray.forEach(image => {
         this.items.push(image);
       });
-    },
-  },
+    }
+  }
 };
 </script>
