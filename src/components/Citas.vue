@@ -122,6 +122,18 @@
               <v-btn
                 depressed
                 large
+                color="primary"
+                class="white--text ma-2 "
+                v-if="_validateData()"
+                @click="getQR()"
+                >PAGAR
+                <v-icon right dark>mdi-credit-card-outline</v-icon>
+              </v-btn>
+            </div>
+            <div v-if="_validateData()">
+              <v-btn
+                depressed
+                large
                 color="#82c9eb"
                 class="white--text ma-2 "
                 v-if="_validateData()"
@@ -145,6 +157,35 @@
             </div>
           </v-card-actions>
           <!-- </v-row> -->
+          <v-layout row>
+            <v-flex md6 offset-sm3>
+              <div>
+                <div>
+                  <img class="preview" height="268" width="356" :src="qrURL" />
+                  <br />
+                </div>
+                <div>
+                  <v-btn @click="click1()">Cargar comprobante</v-btn>
+                  <input
+                    type="file"
+                    ref="input1"
+                    style="display: none"
+                    @change="previewImage"
+                    accept="image/*"
+                  />
+                </div>
+                <div v-if="imageData != null">
+                  <img
+                    class="preview"
+                    height="268"
+                    width="356"
+                    :src="comprobanteURL"
+                  />
+                  <br />
+                </div>
+              </div>
+            </v-flex>
+          </v-layout>
         </v-form>
       </v-card>
     </v-dialog>
@@ -153,6 +194,7 @@
 
 <script>
 const db = require("@/firebaseConfig.js");
+import firebase from "firebase";
 
 export default {
   name: "Citas",
@@ -201,7 +243,10 @@ export default {
           "*El numero del CI no debe contener mas de 10 caracteres"
       ],
       dateRule: [v => !!v || "Este campo es requerido!"]
-    }
+    },
+    qrURL: "",
+    comprobanteURL: "",
+    imageData: null
   }),
   props: {
     dialog: {
@@ -319,10 +364,88 @@ export default {
         parseInt(app_date[1]) >= month &&
         parseInt(app_date[2]) >= day
       );
+    },
+
+    getQR() {
+      this.qrURL = null;
+      const storageRef = firebase.storage().ref("images/QR_200.jpg");
+      storageRef.getDownloadURL().then(url => {
+        this.qrURL = url;
+        console.log(url);
+      });
+    },
+
+    /* onUploadImage() {
+      const self = this;
+      const file = self.selectedFile;
+      if (!file) {
+        return;
+      }
+      self.isUploading = true;
+      const storageRef = db
+        .storage()
+        .ref("/comprobantes/" + this.appointment.id);
+      const task = storageRef.put(file)
+      task.on(
+        "state_changed",
+        function progress(snapshot) {
+          self.status = "UPLOADING...";
+          self.percentage =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        },
+        function error() {
+          self.status = "FAILED TRY AGAIN!";
+          self.isUploading = false;
+        },
+
+        function complete(event) {
+          self.status = "UPLOAD COMPLETED";
+          self.isUploading = false;
+          storageRef.getDownloadURL().then(url => {
+            console.log(url);
+          });
+        }
+      )
+    }*/
+    click1() {
+      this.$refs.input1.click();
+    },
+
+    previewImage(event) {
+      this.uploadValue = 0;
+      this.comprobanteURL = null;
+      this.imageData = event.target.files[0];
+      this.onUpload();
+    },
+
+    onUpload() {
+      this.comprobanteURL = null;
+      const storageRef = firebase
+        .storage()
+        .ref("/comprobantes/" + this.getAppointmentId())
+        .put(this.imageData);
+      storageRef.on(
+        `state_changed`,
+        snapshot => {
+          this.uploadValue =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {
+          this.uploadValue = 100;
+          storageRef.snapshot.ref.getDownloadURL().then(url => {
+            this.comprobanteURL = url;
+            console.log(this.comprobanteURL);
+          });
+        }
+      );
     }
   }
 };
 </script>
+
 <style>
 .title {
   background-color: #82c9eb;

@@ -64,13 +64,7 @@
                   params: { id: hospital.id }
                 }"
               >
-                >
-                <v-btn
-                  class="ma-2"
-                  id="info"
-                  :rounded="true"
-                  color="#D6DBDF"
-                  @click.stop="openInfoDialog(hospital.id)"
+                <v-btn class="ma-2" id="info" :rounded="true" color="#D6DBDF"
                   >Ver más</v-btn
                 >
               </router-link>
