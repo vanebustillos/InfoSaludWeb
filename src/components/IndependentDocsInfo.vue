@@ -154,7 +154,7 @@
       <v-divider></v-divider>
       <v-row>
         <v-col md="8">
-          <Comments />
+          <Comments place="medicosInd" :doc="_getId()" />
         </v-col>
       </v-row>
     </v-container>
@@ -184,6 +184,7 @@ export default {
 
   data() {
     return {
+      doc: "",
       id: "",
       name: "",
       address: "",
@@ -200,6 +201,7 @@ export default {
       value: "",
       lat: Number,
       lng: Number,
+      place: "",
       markers: [
         {
           //position: { lat: this.lat, lng: this.lng },

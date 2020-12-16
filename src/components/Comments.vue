@@ -54,6 +54,7 @@
 </template>
 
 <script>
+import { db, firebase } from "@/firebaseConfig.js";
 export default {
   name: "Comments",
   components: {},
@@ -84,15 +85,35 @@ export default {
     ],
   }),
 
+  props: {
+    place: {
+      type: String,
+    },
+    doc: {
+      type: String,
+    },
+  },
+
   methods: {
     addComment() {
       if (this.$refs.form.validate()) {
-        console.log(
-          "Comentario hecho por: " + this.author + " comentario " + this.content
-        );
+        db.collection(this.place)
+          .doc(this.doc)
+          .update({
+            comments: firebase.firestore.FieldValue.arrayUnion({
+              date: this._getCurrentDate(),
+              author: this.author,
+              content: this.content,
+            }),
+          });
         this.$refs.form.reset();
       }
     },
+    _getCurrentDate() {
+      const today = new Date();
+      const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      return date;
+    }
   },
 };
 </script>
