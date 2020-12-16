@@ -14,7 +14,10 @@
           <v-list-item-group v-model="selectedItem" color="primary">
             <v-list-item v-for="cmnt in comments" :key="cmnt.author">
               <v-list-item-content>
-                <b> @ {{ cmnt.author }}: </b><span>{{ cmnt.content }}</span>
+                <b> @{{ cmnt.author }} :</b
+                ><span
+                  ><i>[{{ cmnt.date }}]: </i> {{ cmnt.content }}</span
+                >
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -66,23 +69,7 @@ export default {
     content: "",
     name: "",
     commentRule: [(v) => !!v || "Campo requerido"],
-    comments: [
-      {
-        author: "Eragon",
-        content:
-          "Lorem ipsum *dolor* sit amet, ***consectetur*** adipisicing elit. Blanditiis architecto repellat unde possimus quaerat corporis assumenda eveniet illum facilis quas sed nobis est sint error expedita voluptas dolore tempora nostrum.",
-      },
-      {
-        author: "Eragon2",
-        content:
-          "Lorem ipsum *dolor* sit amet, ***consectetur*** adipisicing elit. Blanditiis architecto repellat unde possimus quaerat corporis assumenda eveniet illum facilis quas sed nobis est sint error expedita voluptas dolore tempora nostrum.",
-      },
-      {
-        author: "Eragon3",
-        content:
-          "Lorem ipsum *dolor* sit amet, ***consectetur*** adipisicing elit. Blanditiis architecto repellat unde possimus quaerat corporis assumenda eveniet illum facilis quas sed nobis est sint error expedita voluptas dolore tempora nostrum.",
-      },
-    ],
+    comments: [],
   }),
 
   props: {
@@ -92,6 +79,10 @@ export default {
     doc: {
       type: String,
     },
+  },
+
+  mounted() {
+    this._retrieveComments();
   },
 
   methods: {
@@ -106,14 +97,40 @@ export default {
               content: this.content,
             }),
           });
+        this.comments.push({
+          date: this._getCurrentDate(),
+          author: this.author,
+          content: this.content,
+        });
         this.$refs.form.reset();
       }
     },
     _getCurrentDate() {
       const today = new Date();
-      const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      const date =
+        today.getDate() +
+        "/" +
+        (today.getMonth() + 1) +
+        "/" +
+        today.getFullYear();
       return date;
-    }
+    },
+    _retrieveComments() {
+      db.collection(this.place)
+        .doc(this.doc)
+        .get()
+        .then((querySnapshot) => {
+          if (querySnapshot.data() != null) {
+            querySnapshot.data().comments.forEach((comment) => {
+              this.comments.push({
+                date: comment.date,
+                author: comment.author,
+                content: comment.content,
+              });
+            });
+          }
+        });
+    },
   },
 };
 </script>
