@@ -1,0 +1,100 @@
+<template>
+  <v-form ref="form" v-model="valid" lazy-validation>
+    <v-container>
+      <v-card class="pa-2" outlined tile>
+        <v-list-item three-line>
+          <v-list-item-content>
+            <v-list-item-title class="headline">
+              Comentarios
+            </v-list-item-title>
+            <v-divider></v-divider>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list style="max-height: 150px" class="overflow-y-auto" rounded>
+          <v-list-item-group v-model="selectedItem" color="primary">
+            <v-list-item v-for="cmnt in comments" :key="cmnt.author">
+              <v-list-item-content>
+                <b> @ {{ cmnt.author }}: </b><span>{{ cmnt.content }}</span>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+        <v-row no-gutters>
+          <v-col md="12" class="pt-5">
+            <v-text-field
+              placeholder="Escriba un comentario:"
+              filled
+              rounded
+              dense
+              v-model="content"
+              :rules="commentRule"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col md="9">
+            <v-text-field
+              placeholder="Autor:"
+              filled
+              rounded
+              dense
+              v-model="author"
+              :rules="commentRule"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col class="pl-5">
+            <v-btn :disabled="!valid" rounded outlined @click="addComment">
+              Publicar
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-container>
+  </v-form>
+</template>
+
+<script>
+export default {
+  name: "Comments",
+  components: {},
+
+  data: () => ({
+    selectedItem: 1,
+    valid: true,
+    author: "",
+    content: "",
+    name: "",
+    commentRule: [(v) => !!v || "Campo requerido"],
+    comments: [
+      {
+        author: "Eragon",
+        content:
+          "Lorem ipsum *dolor* sit amet, ***consectetur*** adipisicing elit. Blanditiis architecto repellat unde possimus quaerat corporis assumenda eveniet illum facilis quas sed nobis est sint error expedita voluptas dolore tempora nostrum.",
+      },
+      {
+        author: "Eragon2",
+        content:
+          "Lorem ipsum *dolor* sit amet, ***consectetur*** adipisicing elit. Blanditiis architecto repellat unde possimus quaerat corporis assumenda eveniet illum facilis quas sed nobis est sint error expedita voluptas dolore tempora nostrum.",
+      },
+      {
+        author: "Eragon3",
+        content:
+          "Lorem ipsum *dolor* sit amet, ***consectetur*** adipisicing elit. Blanditiis architecto repellat unde possimus quaerat corporis assumenda eveniet illum facilis quas sed nobis est sint error expedita voluptas dolore tempora nostrum.",
+      },
+    ],
+  }),
+
+  methods: {
+    addComment() {
+      if (this.$refs.form.validate()) {
+        console.log(
+          "Comentario hecho por: " + this.author + " comentario " + this.content
+        );
+        this.$refs.form.reset();
+      }
+    },
+  },
+};
+</script>
+<style>
+</style>

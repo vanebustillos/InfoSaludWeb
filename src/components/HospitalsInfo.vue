@@ -173,6 +173,12 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-divider></v-divider>
+      <v-row>
+        <v-col md="8">
+          <Comments />
+        </v-col>
+      </v-row>
     </v-container>
     <Citas
       :appointment="appointment"
@@ -184,6 +190,7 @@
 </template>
 
 <script>
+import Comments from "@/components/Comments.vue";
 import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
 import { gmapsMap, gmapsMarker } from "x5-gmaps";
@@ -194,6 +201,7 @@ export default {
     Citas,
     gmapsMap,
     gmapsMarker,
+    Comments,
   },
 
   data() {
