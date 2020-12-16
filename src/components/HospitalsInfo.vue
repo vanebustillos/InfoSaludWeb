@@ -189,7 +189,7 @@
             <v-list-item three-line>
               <v-list-item-content>
                 <v-list-item-title class="headline">
-                  Dar puntuación a {{ name }}
+                  Dar puntuación de {{ name }}
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-card-actions class="pa-4">
@@ -205,7 +205,7 @@
                     size="30"
                   ></v-rating>
                   <v-spacer></v-spacer>
-                  <v-btn rounded outlined>
+                  <v-btn rounded outlined @click="_setPuntuation()">
                     Puntuar
                   </v-btn>
                   <v-spacer></v-spacer>
@@ -227,7 +227,7 @@
 
 <script>
 import Citas from "@/components/Citas.vue";
-import { db } from "@/firebaseConfig.js";
+import { db, firebase } from "@/firebaseConfig.js";
 import { gmapsMap, gmapsMarker } from "x5-gmaps";
 
 export default {
@@ -289,6 +289,13 @@ export default {
       };
       this.dialog = true;
       this.value = value;
+    },
+    _setPuntuation() {
+      db.collection("hospitales")
+        .doc(this.id)
+        .update({
+          puntuation: firebase.firestore.FieldValue.arrayUnion(this.rating)
+        });
     },
 
     _retrieveData() {

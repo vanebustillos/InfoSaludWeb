@@ -189,7 +189,7 @@
             <v-list-item three-line>
               <v-list-item-content>
                 <v-list-item-title class="headline">
-                  Dar puntuación a {{ name }}
+                  Dar puntuación de {{ name }}
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-card-actions class="pa-4">
