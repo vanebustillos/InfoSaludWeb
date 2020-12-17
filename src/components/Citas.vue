@@ -115,7 +115,6 @@
               </v-row>
             </v-container>
           </v-card-text>
-          <!-- <v-row align="center" justify="center"> -->
           <v-card-actions>
             <v-spacer></v-spacer>
             <div v-if="_validateData()">
@@ -128,18 +127,6 @@
                 @click="getQR()"
                 >PAGAR
                 <v-icon right dark>mdi-credit-card-outline</v-icon>
-              </v-btn>
-            </div>
-            <div v-if="_validateData()">
-              <v-btn
-                depressed
-                large
-                color="#82c9eb"
-                class="white--text ma-2 "
-                v-if="_validateData()"
-                @click="addAppointment()"
-                >SAVE
-                <v-icon right dark>mdi-checkbox-marked-circle</v-icon>
               </v-btn>
             </div>
             <div>
@@ -157,35 +144,72 @@
             </div>
           </v-card-actions>
           <!-- </v-row> -->
-          <v-layout row>
-            <v-flex md6 offset-sm3>
-              <div>
-                <div>
-                  <img class="preview" height="268" width="356" :src="qrURL" />
-                  <br />
-                </div>
-                <div>
-                  <v-btn @click="click1()">Cargar comprobante</v-btn>
-                  <input
-                    type="file"
-                    ref="input1"
-                    style="display: none"
-                    @change="previewImage"
-                    accept="image/*"
-                  />
-                </div>
-                <div v-if="imageData != null">
-                  <img
-                    class="preview"
-                    height="268"
-                    width="356"
-                    :src="comprobanteURL"
-                  />
-                  <br />
-                </div>
+          <v-row>
+            <v-col class="mx-auto" cols="12" sm="6">
+              <div class="mx-auto" v-if="this.showPaymentSection">
+                <h4>1. Escanee el código QR</h4>
+                <br />
+                <img class="preview" height="268" width="356" :src="qrURL" />
               </div>
-            </v-flex>
-          </v-layout>
+            </v-col>
+            <v-col
+              class="mx-auto"
+              cols="12"
+              sm="6"
+              v-if="this.showPaymentSection"
+            >
+              <div class="mx-auto" v-if="this.showPaymentSection">
+                <h4>2. Cargue el comprobante de pago</h4>
+                <v-card-actions>
+                  <div>
+                    <v-btn
+                      depressed
+                      large
+                      color="#82c9eb"
+                      class="white--text ma-2 "
+                      @click="loadVoucher()"
+                      >Cargar</v-btn
+                    >
+                  </div>
+                  <div>
+                    <div>
+                      <input
+                        type="file"
+                        ref="input1"
+                        style="display: none"
+                        @change="previewImage"
+                        accept="image/*"
+                      />
+                    </div>
+                    <div v-if="imageData != null">
+                      <img
+                        class="preview"
+                        height="250"
+                        width="200"
+                        :src="voucherURL"
+                      />
+                      <br />
+                    </div>
+                  </div>
+                </v-card-actions>
+              </div>
+            </v-col>
+          </v-row>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <div v-if="_validateData() && imageData != null">
+              <v-btn
+                depressed
+                large
+                color="#82c9eb"
+                class="white--text ma-2 "
+                v-if="_validateData()"
+                @click="addAppointment()"
+                >SAVE
+                <v-icon right dark>mdi-checkbox-marked-circle</v-icon>
+              </v-btn>
+            </div>
+          </v-card-actions>
         </v-form>
       </v-card>
     </v-dialog>
@@ -245,8 +269,9 @@ export default {
       dateRule: [v => !!v || "Este campo es requerido!"]
     },
     qrURL: "",
-    comprobanteURL: "",
-    imageData: null
+    voucherURL: "",
+    imageData: null,
+    showPaymentSection: false
   }),
   props: {
     dialog: {
@@ -267,7 +292,8 @@ export default {
           clientPhone: "",
           date: new Date().toISOString().substr(0, 10),
           hour: "",
-          health_place: ""
+          health_place: "",
+          voucherURL: ""
         };
       }
     }
@@ -300,6 +326,7 @@ export default {
       this.appointment.date = "";
       this.appointment.hour = "";
       this.appointment.health_place = "";
+      this.showPaymentSection = false;
     },
 
     addAppointment: async function() {
@@ -313,7 +340,8 @@ export default {
             clientPhone: this.appointment.clientPhone,
             date: this.appointment.date,
             hour: this.appointment.hour,
-            health_place: this.value
+            health_place: this.value,
+            voucherURL: this.voucherURL
           });
           this.cancel();
           alert("La cita ha sido guardada exitosamente");
@@ -367,6 +395,7 @@ export default {
     },
 
     getQR() {
+      this.showPaymentSection = true;
       this.qrURL = null;
       const storageRef = firebase.storage().ref("images/QR_200.jpg");
       storageRef.getDownloadURL().then(url => {
@@ -375,51 +404,19 @@ export default {
       });
     },
 
-    /* onUploadImage() {
-      const self = this;
-      const file = self.selectedFile;
-      if (!file) {
-        return;
-      }
-      self.isUploading = true;
-      const storageRef = db
-        .storage()
-        .ref("/comprobantes/" + this.appointment.id);
-      const task = storageRef.put(file)
-      task.on(
-        "state_changed",
-        function progress(snapshot) {
-          self.status = "UPLOADING...";
-          self.percentage =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        },
-        function error() {
-          self.status = "FAILED TRY AGAIN!";
-          self.isUploading = false;
-        },
-
-        function complete(event) {
-          self.status = "UPLOAD COMPLETED";
-          self.isUploading = false;
-          storageRef.getDownloadURL().then(url => {
-            console.log(url);
-          });
-        }
-      )
-    }*/
-    click1() {
+    loadVoucher() {
       this.$refs.input1.click();
     },
 
     previewImage(event) {
       this.uploadValue = 0;
-      this.comprobanteURL = null;
+      this.voucherURL = null;
       this.imageData = event.target.files[0];
-      this.onUpload();
+      this.onUploadVoucher();
     },
 
-    onUpload() {
-      this.comprobanteURL = null;
+    onUploadVoucher() {
+      this.voucherURL = null;
       const storageRef = firebase
         .storage()
         .ref("/comprobantes/" + this.getAppointmentId())
@@ -436,8 +433,8 @@ export default {
         () => {
           this.uploadValue = 100;
           storageRef.snapshot.ref.getDownloadURL().then(url => {
-            this.comprobanteURL = url;
-            console.log(this.comprobanteURL);
+            this.voucherURL = url;
+            console.log(this.voucherURL);
           });
         }
       );
