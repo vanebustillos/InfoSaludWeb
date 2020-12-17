@@ -165,7 +165,7 @@
                 block
                 outlined
                 v-if="available"
-                v-on:click="sendData(appointment, 'H2')"
+                v-on:click="sendData(appointment, id)"
               >
                 Agedar una cita
               </v-btn>
