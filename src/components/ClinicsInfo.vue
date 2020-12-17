@@ -81,9 +81,6 @@
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-list-item-avatar tile height="253" width="500" color="grey">
-                  <!-- <v-img -->
-                  <!-- src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU" -->
-                  <!-- ></v-img> -->
                   <gmaps-map :options="mapOptions">
                     <gmaps-marker
                       :key="index"
@@ -319,7 +316,9 @@ export default {
           .doc(specialty)
           .get()
           .then((querySnapshot) => {
-            this.specialties.push(querySnapshot.data().name);
+            if (querySnapshot.data() != null) {
+              this.specialties.push(querySnapshot.data().name);
+            }
           });
       });
     },

@@ -77,9 +77,6 @@
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-list-item-avatar tile height="253" width="500" color="grey">
-                  <!-- <v-img -->
-                  <!-- src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU" -->
-                  <!-- ></v-img> -->
                   <gmaps-map :options="mapOptions">
                     <gmaps-marker
                       :key="index"
@@ -174,7 +171,7 @@ export default {
   components: {
     Citas,
     gmapsMap,
-    gmapsMarker
+    gmapsMarker,
   },
 
   data() {
@@ -199,14 +196,14 @@ export default {
         {
           //position: { lat: this.lat, lng: this.lng },
           position: { lat: -17.377195905887, lng: -66.156870748678 },
-          title: this.name
-        }
+          title: this.name,
+        },
       ],
       mapOptions: {
         // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.377195905887, lng: -66.156870748678 },
-        zoom: 18
-      }
+        zoom: 18,
+      },
     };
   },
   computed: {},
@@ -218,20 +215,20 @@ export default {
     _getId() {
       return this.$route.params.id;
     },
-    
-    sendData: function(appointment, value) {
+
+    sendData: function (appointment, value) {
       this.appointment = {
-        ...appointment
+        ...appointment,
       };
       this.dialog = true;
       this.value = value;
     },
-    
+
     _retrieveData() {
       db.collection("medicosInd")
         .doc(this.id)
         .get()
-        .then(querySnapshot => {
+        .then((querySnapshot) => {
           this.name =
             querySnapshot.data().name + " " + querySnapshot.data().lastname;
           this.address = querySnapshot.data().location;
@@ -243,10 +240,10 @@ export default {
           this.lng = querySnapshot.data().position.lng;
           console.log("Position: " + this.lat + " , " + this.lng);
 
-          let cont=0;
+          let cont = 0;
           querySnapshot.data().attention.forEach((hour) => {
-            if (cont == 0){
-              this.attention.push("Lunes: "+hour);
+            if (cont == 0) {
+              this.attention.push("Lunes: " + hour);
               cont++;
             } else if (cont == 1) {
               this.attention.push("Martes: " + hour);
@@ -269,7 +266,7 @@ export default {
             }
           });
 
-          querySnapshot.data().phones.forEach(phone => {
+          querySnapshot.data().phones.forEach((phone) => {
             if (this.telephones == "") {
               this.telephones = phone;
             } else {
@@ -285,7 +282,7 @@ export default {
           this._getImages(querySnapshot.data().carrousel);
         });
     },
-    
+
     _getAttention(attentionArray) {
       let cont = 0;
       attentionArray.forEach((hour) => {
@@ -313,23 +310,25 @@ export default {
         }
       });
     },
-    
+
     _getSpecialties(specialtiesArray) {
       specialtiesArray.forEach((specialty) => {
         db.collection("especialidades")
           .doc(specialty)
           .get()
           .then((querySnapshot) => {
-            this.specialties.push(querySnapshot.data().name);
+            if (querySnapshot.data() != null) {
+              this.specialties.push(querySnapshot.data().name);
+            }
           });
       });
     },
-    
+
     _getImages(imagesArray) {
       imagesArray.forEach((image) => {
         this.items.push(image);
       });
-    }
+    },
   },
 };
 </script>
