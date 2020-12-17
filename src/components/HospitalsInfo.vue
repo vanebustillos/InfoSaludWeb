@@ -21,6 +21,17 @@
                   {{ telephones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
+              <span> ({{ averageScores }}) </span>
+              <v-rating
+                v-model="averageScores"
+                background-color="yellow accent-4"
+                color="yellow accent-4"
+                dense
+                half-increments
+                hover
+                readonly
+                size="30"
+              ></v-rating>
             </v-list-item>
           </v-card>
         </v-col>
@@ -205,7 +216,7 @@
                     size="30"
                   ></v-rating>
                   <v-spacer></v-spacer>
-                  <v-btn rounded outlined @click="_setPuntuation()">
+                  <v-btn rounded outlined @click="setScore()">
                     Puntuar
                   </v-btn>
                   <v-spacer></v-spacer>
@@ -270,7 +281,9 @@ export default {
         center: { lat: -17.37155059512898, lng: -66.16109964427892 },
         zoom: 16
       },
-      rating: 0
+      puntuation: [],
+      rating: 0,
+      averageScores: 0
     };
   },
   computed: {},
@@ -290,12 +303,16 @@ export default {
       this.dialog = true;
       this.value = value;
     },
-    _setPuntuation() {
+    setScore() {
       db.collection("hospitales")
         .doc(this.id)
         .update({
-          puntuation: firebase.firestore.FieldValue.arrayUnion(this.rating)
+          puntuation: firebase.firestore.FieldValue.arrayUnion(
+            this.rating.toString()
+          )
         });
+      this.puntuation.push(this.rating);
+      console.log("saved");
     },
 
     _retrieveData() {
@@ -312,7 +329,6 @@ export default {
           this.lat = querySnapshot.data().position.lat;
           this.lng = querySnapshot.data().position.lng;
           console.log("Position: " + this.lat + " , " + this.lng);
-
           querySnapshot.data().phones.forEach(phone => {
             if (this.telephones == "") {
               this.telephones = phone;
@@ -328,6 +344,7 @@ export default {
           this._getSpecialties(querySnapshot.data().specialties);
           this._getServices(querySnapshot.data().services);
           this._getImages(querySnapshot.data().carrousel);
+          this._getScore();
         });
     },
 
@@ -371,7 +388,6 @@ export default {
           });
       });
     },
-
     _getServices(servicesArray) {
       servicesArray.forEach(service => {
         db.collection("servicios")
@@ -387,6 +403,27 @@ export default {
       imagesArray.forEach(image => {
         this.items.push(image);
       });
+    },
+    _getScore() {
+      db.collection("hospitales")
+        .doc(this.id)
+        .get()
+        .then(querySnapshot => {
+          this.puntuation = querySnapshot.data().puntuation;
+          this._averageScores();
+        });
+    },
+    _averageScores() {
+      let total = 0;
+      this.puntuation.forEach(puntuation => {
+        total = total + parseFloat(puntuation);
+        console.log(parseInt(puntuation));
+      });
+      console.log(this.puntuation.length);
+      var number = total / this.puntuation.length;
+      this.averageScores =  parseFloat(number.toFixed(1));
+      console.log(parseFloat(total));
+      console.log(this.averageScores);
     }
   }
 };
