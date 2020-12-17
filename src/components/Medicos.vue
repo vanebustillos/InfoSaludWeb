@@ -28,24 +28,24 @@
       </v-row>
     </v-container>
     <v-container>
-      <v-row v-for="(medico, index) in filteredData" :key="index">
+      <v-row v-for="(doctor, index) in filteredData" :key="index">
         <v-col class="mx-auto" cols="12" md="6">
           <v-card tile hover color="#F6F6F6">
             <v-list-item three-line>
               <v-list-item-avatar tile size="100" color="#FFFFFF">
-                <v-img :src="medico.img"></v-img>
+                <v-img :src="doctor.img"></v-img>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="headline">
-                  {{ medico.name }}{{ medico.lastname }}
+                  {{ doctor.name }} {{ doctor.lastname }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   <v-icon> mdi-map-marker </v-icon>
-                  {{ medico.location }}
+                  {{ doctor.location }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle>
                   <v-icon> mdi-phone </v-icon>
-                  {{ medico.phones }}
+                  {{ doctor.phones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <router-link :to="{
@@ -58,7 +58,6 @@
                 :rounded="true"
                 color="#D6DBDF"
                 >Ver más</v-btn
-              >
               </router-link>
             </v-list-item>
           </v-card>
