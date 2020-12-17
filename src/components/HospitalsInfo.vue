@@ -213,10 +213,30 @@
                     dense
                     half-increments
                     hover
+                    v-if="availableRating"
+                    size="30"
+                  ></v-rating>
+                  <v-rating
+                    v-model="rating"
+                    background-color="yellow accent-4"
+                    color="yellow accent-4"
+                    dense
+                    half-increments
+                    hover
+                    readonly
+                    v-else
                     size="30"
                   ></v-rating>
                   <v-spacer></v-spacer>
-                  <v-btn rounded outlined @click="setScore()">
+                  <v-btn
+                    rounded
+                    outlined
+                    v-if="availableRating"
+                    @click="setScore()"
+                  >
+                    Puntuar
+                  </v-btn>
+                  <v-btn rounded outlined v-else disabled>
                     Puntuar
                   </v-btn>
                   <v-spacer></v-spacer>
@@ -238,7 +258,7 @@
 
 <script>
 import Citas from "@/components/Citas.vue";
-import { db, firebase } from "@/firebaseConfig.js";
+import { db } from "@/firebaseConfig.js";
 import { gmapsMap, gmapsMarker } from "x5-gmaps";
 
 export default {
@@ -281,9 +301,11 @@ export default {
         center: { lat: -17.37155059512898, lng: -66.16109964427892 },
         zoom: 16
       },
-      puntuation: [],
+      puntuationTotal: 0,
       rating: 0,
-      averageScores: 0
+      averageScores: 0,
+      availableRating: true,
+      quantity: 0
     };
   },
   computed: {},
@@ -304,17 +326,17 @@ export default {
       this.value = value;
     },
     setScore() {
-      db.collection("hospitales")
+      db.collection("clinicas")
         .doc(this.id)
         .update({
-          puntuation: firebase.firestore.FieldValue.arrayUnion(
-            this.rating.toString()
-          )
+          puntuation: {
+            accumulated: this.puntuationTotal + this.rating,
+            quantity: this.quantity + 1
+          }
         });
-      this.puntuation.push(this.rating);
+      this.availableRating = false;
       console.log("saved");
     },
-
     _retrieveData() {
       db.collection("hospitales")
         .doc(this.id)
@@ -409,20 +431,15 @@ export default {
         .doc(this.id)
         .get()
         .then(querySnapshot => {
-          this.puntuation = querySnapshot.data().puntuation;
+          this.puntuationTotal = querySnapshot.data().puntuation.accumulated;
+          this.quantity = querySnapshot.data().puntuation.quantity;
           this._averageScores();
         });
     },
     _averageScores() {
-      let total = 0;
-      this.puntuation.forEach(puntuation => {
-        total = total + parseFloat(puntuation);
-        console.log(parseInt(puntuation));
-      });
-      console.log(this.puntuation.length);
-      var number = total / this.puntuation.length;
-      this.averageScores =  parseFloat(number.toFixed(1));
-      console.log(parseFloat(total));
+      var score = this.puntuationTotal / this.quantity;
+      this.averageScores = parseFloat(score.toFixed(1));
+      console.log(parseFloat(score));
       console.log(this.averageScores);
     }
   }
