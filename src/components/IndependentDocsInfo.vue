@@ -21,6 +21,17 @@
                   {{ telephones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
+              <span> ({{ averageScores }}) </span>
+              <v-rating
+                v-model="averageScores"
+                background-color="yellow accent-4"
+                color="yellow accent-4"
+                dense
+                half-increments
+                hover
+                readonly
+                size="30"
+              ></v-rating>
             </v-list-item>
           </v-card>
         </v-col>
@@ -151,6 +162,60 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-divider></v-divider>
+      <v-row>
+        <v-col md="8">
+          <Comments place="medicosInd" :doc="_getId()" />
+        </v-col>
+        <v-col class="pt-6" cols="6" md="4">
+          <v-card class="pa-2" outlined tile>
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="headline">
+                  Dar puntuación de {{ name }}
+                </v-list-item-title>
+                <v-divider></v-divider>
+                <v-card-actions class="pa-4">
+                  <v-spacer></v-spacer>
+                  <span> ({{ rating }}) </span>
+                  <v-rating
+                    v-model="rating"
+                    background-color="yellow accent-4"
+                    color="yellow accent-4"
+                    dense
+                    half-increments
+                    hover
+                    v-if="availableRating"
+                    size="30"
+                  ></v-rating>
+                  <v-rating
+                    v-model="rating"
+                    background-color="yellow accent-4"
+                    color="yellow accent-4"
+                    dense
+                    half-increments
+                    hover
+                    readonly
+                    v-else
+                    size="30"
+                  ></v-rating>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    rounded
+                    outlined
+                    v-if="availableRating"
+                    @click="setScore()"
+                  >
+                    Puntuar
+                  </v-btn>
+                  <v-btn rounded outlined v-else disabled> Puntuar </v-btn>
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-list-item-content>
+            </v-list-item>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
     <Citas
       :appointment="appointment"
@@ -162,6 +227,7 @@
 </template>
 
 <script>
+import Comments from "@/components/Comments.vue";
 import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
 import { gmapsMap, gmapsMarker } from "x5-gmaps";
@@ -172,10 +238,12 @@ export default {
     Citas,
     gmapsMap,
     gmapsMarker,
+    Comments,
   },
 
   data() {
     return {
+      doc: "",
       id: "",
       name: "",
       address: "",
@@ -192,6 +260,7 @@ export default {
       value: "",
       lat: Number,
       lng: Number,
+      place: "",
       markers: [
         {
           //position: { lat: this.lat, lng: this.lng },
@@ -204,6 +273,11 @@ export default {
         center: { lat: -17.377195905887, lng: -66.156870748678 },
         zoom: 18,
       },
+      puntuationTotal: 0,
+      rating: 0,
+      averageScores: 0,
+      availableRating: true,
+      quantity: 0,
     };
   },
   computed: {},
@@ -222,6 +296,20 @@ export default {
       };
       this.dialog = true;
       this.value = value;
+    },
+
+    setScore() {
+      db.collection("medicosInd")
+        .doc(this.id)
+        .update({
+          puntuation: {
+            accumulated: this.puntuationTotal + this.rating,
+            quantity: this.quantity + 1,
+          },
+        });
+      this._getScore();
+      this.availableRating = false;
+      console.log("saved");
     },
 
     _retrieveData() {
@@ -328,6 +416,23 @@ export default {
       imagesArray.forEach((image) => {
         this.items.push(image);
       });
+    },
+
+    _getScore() {
+      db.collection("medicosInd")
+        .doc(this.id)
+        .get()
+        .then((querySnapshot) => {
+          this.puntuationTotal = querySnapshot.data().puntuation.accumulated;
+          this.quantity = querySnapshot.data().puntuation.quantity;
+          this._averageScores();
+        });
+    },
+    _averageScores() {
+      var score = this.puntuationTotal / this.quantity;
+      this.averageScores = parseFloat(score.toFixed(1));
+      console.log(parseFloat(score));
+      console.log(this.averageScores);
     },
   },
 };
