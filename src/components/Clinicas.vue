@@ -67,8 +67,7 @@
                 id="info"
                 :rounded="true"
                 color="#D6DBDF"
-                >Ver más</v-btn
-              >
+                >Ver más</v-btn>
               </router-link>
             </v-list-item>
           </v-card>
