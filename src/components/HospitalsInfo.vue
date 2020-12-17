@@ -437,10 +437,14 @@ export default {
         });
     },
     _averageScores() {
-      var score = this.puntuationTotal / this.quantity;
-      this.averageScores = parseFloat(score.toFixed(1));
-      console.log(parseFloat(score));
-      console.log(this.averageScores);
+      if (this.quantity != 0 && this.accumulated != 0) {
+        var score = this.puntuationTotal / this.quantity;
+        this.averageScores = parseFloat(score.toFixed(1));
+        console.log(parseFloat(score));
+        console.log(this.averageScores);
+      } else {
+        this.averageScores = 0;
+      }
     }
   }
 };
