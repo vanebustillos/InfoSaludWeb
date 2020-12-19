@@ -173,7 +173,7 @@
                 block
                 outlined
                 v-if="available"
-                v-on:click="sendData(appointment, 'C1')"
+                v-on:click="sendData(appointment, value)"
               >
                 Agedar una cita
               </v-btn>
@@ -283,7 +283,7 @@ export default {
       items: [],
       appointment: {},
       dialog: false,
-      value: "",
+      value: this.$route.params.id,
       place: "",
       markers: [
         {
@@ -313,7 +313,6 @@ export default {
     _getId() {
       return this.$route.params.id;
     },
-
     sendData: function (appointment, value) {
       this.appointment = {
         ...appointment,

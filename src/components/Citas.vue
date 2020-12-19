@@ -52,6 +52,14 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
+                  <v-select
+                    :items="specialties"
+                    label="Especialidades"
+                    v-model="appointment.specialty"
+                  >
+                  </v-select>
+                </v-col>
+                <v-col cols="12">
                   <v-menu
                     v-model="menu_date"
                     :close-on-content-click="false"
@@ -77,7 +85,7 @@
                       color="#82c9eb"
                       :landscape="true"
                       class="mt-4"
-                      min="2020-10-30"
+                      min="2020-12-01"
                     ></v-date-picker>
                   </v-menu>
                 </v-col>
@@ -228,6 +236,7 @@ export default {
     showCurrent: true,
     menu_hour: false,
     appointments_list: [],
+    specialties: [],
     valid: true,
     rules: {
       clientNameRules: [
@@ -290,6 +299,7 @@ export default {
           clientSurnames: "",
           clientCi: "",
           clientPhone: "",
+          specialty: "",
           date: new Date().toISOString().substr(0, 10),
           hour: "",
           health_place: "",
@@ -299,11 +309,12 @@ export default {
     }
   },
   created: async function() {
+    console.log(this.value);
     let citasDB = [];
-    await db.citasCollection.get().then(q => {
-      q.forEach(doc => {
+    await db.citasCollection.get().then(cita => {
+      cita.forEach(doc => {
         citasDB.push(doc);
-        console.log(`${doc.id} => ${doc.data()}`);
+        // console.log(`${doc.id} => ${doc.data()}`);
       });
     });
     if (citasDB === null) {
@@ -311,6 +322,38 @@ export default {
     } else {
       citasDB.forEach(cita => {
         this.appointments_list.push(cita);
+      });
+    }
+    let especialidadesDB = [];
+    await db.especialidadesCollection.get().then(especialidad => {
+      especialidad.forEach(doc => {
+        doc.data().establishments.forEach(q => {
+          if (q === this.value) {
+            // console.log(doc.data().establishments);
+            especialidadesDB.push(doc.data().name);
+          }
+        });
+        // console.log(`${doc.id} => ${doc.data().name}`);
+      });
+    });
+    if (especialidadesDB === null) {
+      this.specialties = [];
+    } else {
+      especialidadesDB.forEach(especialidad => {
+        this.specialties.push(especialidad);
+      });
+    }
+    let establecimientoDB = [];
+    await db.especialidadesCollection.get().then(especialidad => {
+      especialidad.forEach(doc => {
+        establecimientoDB.push(doc.data().name);
+      });
+    });
+    if (especialidadesDB === null) {
+      this.specialties = [];
+    } else {
+      especialidadesDB.forEach(especialidad => {
+        this.specialties.push(especialidad);
       });
     }
   },
@@ -338,6 +381,7 @@ export default {
             clientSurnames: this.appointment.clientSurnames,
             clientCi: this.appointment.clientCi,
             clientPhone: this.appointment.clientPhone,
+            specialty: this.appointment.specialty,
             date: this.appointment.date,
             hour: this.appointment.hour,
             health_place: this.value,
@@ -374,6 +418,7 @@ export default {
         this.appointment.clientSurnames !== "" &&
         this.appointment.clientCi !== "" &&
         this.appointment.clientPhone !== "" &&
+        this.appointment.specialty !== "" &&
         this.appointment.date !== "" &&
         this.appointment.hour !== ""
       );
@@ -445,7 +490,7 @@ export default {
 
 <style>
 .title {
-  background-color: #82c9eb;
-  color: white;
+  /* background-color: #82c9eb; */
+  color: black;
 }
 </style>
