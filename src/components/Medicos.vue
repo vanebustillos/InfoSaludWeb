@@ -48,16 +48,15 @@
                   {{ doctor.phones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <router-link :to="{
-                name: 'IndependentDocsInfo',
-                params: { id: medico.id }
-              }">
-                <v-btn
-                class="ma-2"
-                id="info"
-                :rounded="true"
-                color="#D6DBDF"
-                >Ver más</v-btn
+              <router-link
+                :to="{
+                  name: 'IndependentDocsInfo',
+                  params: { id: doctor.id }
+                }"
+              >
+                <v-btn class="ma-2" id="info" :rounded="true" color="#D6DBDF"
+                  >Ver más</v-btn
+                >
               </router-link>
             </v-list-item>
           </v-card>
