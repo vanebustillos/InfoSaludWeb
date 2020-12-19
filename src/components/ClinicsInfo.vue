@@ -165,7 +165,7 @@
                 block
                 outlined
                 v-if="available"
-                v-on:click="sendData(appointment, 'C1')"
+                v-on:click="sendData(appointment, value)"
               >
                 Agedar una cita
               </v-btn>
@@ -218,7 +218,7 @@ export default {
       items: [],
       appointment: {},
       dialog: false,
-      value: "",
+      value: this.$route.params.id,
       markers: [
         {
           //position: { lat: this.lat, lng: this.lng },
@@ -230,7 +230,7 @@ export default {
         // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.37863551610984, lng: -66.16464417294189 },
         zoom: 16
-      },
+      }
     };
   },
   computed: {},
@@ -239,11 +239,9 @@ export default {
     this._retrieveData();
   },
   methods: {
-  
     _getId() {
       return this.$route.params.id;
     },
-    
     sendData: function(appointment, value) {
       this.appointment = {
         ...appointment

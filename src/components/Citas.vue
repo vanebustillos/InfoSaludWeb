@@ -253,17 +253,29 @@ export default {
         this.appointments_list.push(cita);
       });
     }
-    // this._getSpecialties();
     let especialidadesDB = [];
     await db.especialidadesCollection.get().then(especialidad => {
       especialidad.forEach(doc => {
-        // doc.data().establishments.forEach(establecimiento => {
-        // if (establecimiento === this.id) {
-        especialidadesDB.push(doc.data().name);
-        // }
-        // });
-
+        doc.data().establishments.forEach(q => {
+          if (q === this.value) {
+            // console.log(doc.data().establishments);
+            especialidadesDB.push(doc.data().name);
+          }
+        });
         // console.log(`${doc.id} => ${doc.data().name}`);
+      });
+    });
+    if (especialidadesDB === null) {
+      this.specialties = [];
+    } else {
+      especialidadesDB.forEach(especialidad => {
+        this.specialties.push(especialidad);
+      });
+    }
+    let establecimientoDB = [];
+    await db.especialidadesCollection.get().then(especialidad => {
+      especialidad.forEach(doc => {
+        establecimientoDB.push(doc.data().name);
       });
     });
     if (especialidadesDB === null) {
@@ -359,7 +371,6 @@ export default {
 <style>
 .title {
   /* background-color: #82c9eb; */
-  /* color: white; */
   color: black;
 }
 </style>
