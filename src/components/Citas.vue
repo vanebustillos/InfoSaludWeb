@@ -5,7 +5,7 @@
         <v-form ref="form">
           <v-card-title class="title">
             <v-row align="center" justify="center">
-              <h2>{{ "Agendar Cita Médica" }}</h2></v-row
+              <h2>{{ "Agendar Cita Médica" }}{{ pageName }}</h2></v-row
             ></v-card-title
           >
           <v-card-text>
@@ -225,12 +225,15 @@
 </template>
 
 <script>
-const db = require("@/firebaseConfig.js");
+import { db } from "@/firebaseConfig.js";
+// const db = require("@/firebaseConfig.js");
 import firebase from "firebase";
 
 export default {
   name: "Citas",
   data: () => ({
+    place: "",
+    pageName: "",
     now: new Date().toISOString().substr(0, 10),
     menu_date: false,
     showCurrent: true,
@@ -309,53 +312,19 @@ export default {
     }
   },
   created: async function() {
-    console.log(this.value);
-    let citasDB = [];
-    await db.citasCollection.get().then(cita => {
-      cita.forEach(doc => {
-        citasDB.push(doc);
-        // console.log(`${doc.id} => ${doc.data()}`);
+    this.putName();
+    await db
+      .collection(this.place)
+      .doc(this.value)
+      .get()
+      .then(query => {
+        this.pageName += query.data().name;
+        if (this.place === "medicosInd") {
+          this.pageName += " " + query.data().lastname;
+        }
       });
-    });
-    if (citasDB === null) {
-      this.appointments_list = [];
-    } else {
-      citasDB.forEach(cita => {
-        this.appointments_list.push(cita);
-      });
-    }
-    let especialidadesDB = [];
-    await db.especialidadesCollection.get().then(especialidad => {
-      especialidad.forEach(doc => {
-        doc.data().establishments.forEach(q => {
-          if (q === this.value) {
-            // console.log(doc.data().establishments);
-            especialidadesDB.push(doc.data().name);
-          }
-        });
-        // console.log(`${doc.id} => ${doc.data().name}`);
-      });
-    });
-    if (especialidadesDB === null) {
-      this.specialties = [];
-    } else {
-      especialidadesDB.forEach(especialidad => {
-        this.specialties.push(especialidad);
-      });
-    }
-    let establecimientoDB = [];
-    await db.especialidadesCollection.get().then(especialidad => {
-      especialidad.forEach(doc => {
-        establecimientoDB.push(doc.data().name);
-      });
-    });
-    if (especialidadesDB === null) {
-      this.specialties = [];
-    } else {
-      especialidadesDB.forEach(especialidad => {
-        this.specialties.push(especialidad);
-      });
-    }
+    this.getAppointments();
+    this.getSpecialties();
   },
   computed: {},
   methods: {
@@ -372,21 +341,65 @@ export default {
       this.showPaymentSection = false;
     },
 
+    async getAppointments() {
+      let citasDB = [];
+      await db
+        .collection("citas")
+        .get()
+        .then(cita => {
+          cita.forEach(doc => {
+            citasDB.push(doc);
+          });
+        });
+      if (citasDB === null) {
+        this.appointments_list = [];
+      } else {
+        citasDB.forEach(cita => {
+          this.appointments_list.push(cita);
+        });
+      }
+    },
+
+    async getSpecialties() {
+      let especialidadesDB = [];
+      await db
+        .collection("especialidades")
+        .get()
+        .then(especialidad => {
+          especialidad.forEach(doc => {
+            doc.data().establishments.forEach(q => {
+              if (q === this.value) {
+                especialidadesDB.push(doc.data().name);
+              }
+            });
+          });
+        });
+      if (especialidadesDB === null) {
+        this.specialties = [];
+      } else {
+        especialidadesDB.forEach(especialidad => {
+          this.specialties.push(especialidad);
+        });
+      }
+    },
     addAppointment: async function() {
       if (this._validateData()) {
         if (this._validateDateFormat(this.appointment.date)) {
-          await db.citasCollection.doc(this.getAppointmentId()).set({
-            id: this.getAppointmentId(),
-            clientName: this.appointment.clientName,
-            clientSurnames: this.appointment.clientSurnames,
-            clientCi: this.appointment.clientCi,
-            clientPhone: this.appointment.clientPhone,
-            specialty: this.appointment.specialty,
-            date: this.appointment.date,
-            hour: this.appointment.hour,
-            health_place: this.value,
-            voucherURL: this.voucherURL
-          });
+          await db
+            .collection("citas")
+            .doc(this.getAppointmentId())
+            .set({
+              id: this.getAppointmentId(),
+              clientName: this.appointment.clientName,
+              clientSurnames: this.appointment.clientSurnames,
+              clientCi: this.appointment.clientCi,
+              clientPhone: this.appointment.clientPhone,
+              specialty: this.appointment.specialty,
+              date: this.appointment.date,
+              hour: this.appointment.hour,
+              health_place: this.value,
+              voucherURL: this.voucherURL
+            });
           this.cancel();
           alert("La cita ha sido guardada exitosamente");
         } else {
@@ -483,6 +496,21 @@ export default {
           });
         }
       );
+    },
+
+    putName() {
+      if (this.value[0] === "M" && this.value[1] === "I") {
+        this.place = "medicosInd";
+        this.pageName = " con ";
+      } else {
+        if (this.value[0] === "C") {
+          this.place = "clinicas";
+          this.pageName = " en la ";
+        } else {
+          this.place = "hospitales";
+          this.pageName = " en el ";
+        }
+      }
     }
   }
 };

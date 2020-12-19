@@ -22,13 +22,5 @@ const db = firebase.firestore();
 
 // firebase collectionsa
 const hospitalCollection = db.collection("hospital");
-const citasCollection = db.collection("citas");
-const especialidadesCollection = db.collection("especialidades");
 //const orderCollection = db.collection("buyout_order");
-export {
-  firebase,
-  db,
-  hospitalCollection,
-  citasCollection,
-  especialidadesCollection
-};
+export { firebase, db, hospitalCollection };

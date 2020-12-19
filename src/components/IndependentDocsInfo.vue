@@ -238,7 +238,7 @@ export default {
     Citas,
     gmapsMap,
     gmapsMarker,
-    Comments,
+    Comments
   },
 
   data() {
@@ -265,19 +265,19 @@ export default {
         {
           //position: { lat: this.lat, lng: this.lng },
           position: { lat: -17.377195905887, lng: -66.156870748678 },
-          title: this.name,
-        },
+          title: this.name
+        }
       ],
       mapOptions: {
         // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.377195905887, lng: -66.156870748678 },
-        zoom: 18,
+        zoom: 18
       },
       puntuationTotal: 0,
       rating: 0,
       averageScores: 0,
       availableRating: true,
-      quantity: 0,
+      quantity: 0
     };
   },
   computed: {},
@@ -290,9 +290,9 @@ export default {
       return this.$route.params.id;
     },
 
-    sendData: function (appointment, value) {
+    sendData: function(appointment, value) {
       this.appointment = {
-        ...appointment,
+        ...appointment
       };
       this.dialog = true;
       this.value = value;
