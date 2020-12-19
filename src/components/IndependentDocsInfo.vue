@@ -21,6 +21,17 @@
                   {{ telephones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
+              <span> ({{ averageScores }}) </span>
+              <v-rating
+                v-model="averageScores"
+                background-color="yellow accent-4"
+                color="yellow accent-4"
+                dense
+                half-increments
+                hover
+                readonly
+                size="30"
+              ></v-rating>
             </v-list-item>
           </v-card>
         </v-col>
@@ -77,9 +88,6 @@
                 </v-list-item-title>
                 <v-divider></v-divider>
                 <v-list-item-avatar tile height="253" width="500" color="grey">
-                  <!-- <v-img -->
-                  <!-- src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU0v7eyrhtZP0te27KU_5_PabF_z_sVE75Cw&usqp=CAU" -->
-                  <!-- ></v-img> -->
                   <gmaps-map :options="mapOptions">
                     <gmaps-marker
                       :key="index"
@@ -154,6 +162,60 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-divider></v-divider>
+      <v-row>
+        <v-col md="8">
+          <Comments place="medicosInd" :doc="_getId()" />
+        </v-col>
+        <v-col class="pt-6" cols="6" md="4">
+          <v-card class="pa-2" outlined tile>
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="headline">
+                  Dar puntuación de {{ name }}
+                </v-list-item-title>
+                <v-divider></v-divider>
+                <v-card-actions class="pa-4">
+                  <v-spacer></v-spacer>
+                  <span> ({{ rating }}) </span>
+                  <v-rating
+                    v-model="rating"
+                    background-color="yellow accent-4"
+                    color="yellow accent-4"
+                    dense
+                    half-increments
+                    hover
+                    v-if="availableRating"
+                    size="30"
+                  ></v-rating>
+                  <v-rating
+                    v-model="rating"
+                    background-color="yellow accent-4"
+                    color="yellow accent-4"
+                    dense
+                    half-increments
+                    hover
+                    readonly
+                    v-else
+                    size="30"
+                  ></v-rating>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    rounded
+                    outlined
+                    v-if="availableRating"
+                    @click="setScore()"
+                  >
+                    Puntuar
+                  </v-btn>
+                  <v-btn rounded outlined v-else disabled> Puntuar </v-btn>
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-list-item-content>
+            </v-list-item>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
     <Citas
       :appointment="appointment"
@@ -165,6 +227,7 @@
 </template>
 
 <script>
+import Comments from "@/components/Comments.vue";
 import Citas from "@/components/Citas.vue";
 import { db } from "@/firebaseConfig.js";
 import { gmapsMap, gmapsMarker } from "x5-gmaps";
@@ -174,11 +237,13 @@ export default {
   components: {
     Citas,
     gmapsMap,
-    gmapsMarker
+    gmapsMarker,
+    Comments,
   },
 
   data() {
     return {
+      doc: "",
       id: "",
       name: "",
       address: "",
@@ -195,18 +260,24 @@ export default {
       value: this.$route.params.id,
       lat: Number,
       lng: Number,
+      place: "",
       markers: [
         {
           //position: { lat: this.lat, lng: this.lng },
           position: { lat: -17.377195905887, lng: -66.156870748678 },
-          title: this.name
-        }
+          title: this.name,
+        },
       ],
       mapOptions: {
         // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.377195905887, lng: -66.156870748678 },
-        zoom: 18
+        zoom: 18,
       },
+      puntuationTotal: 0,
+      rating: 0,
+      averageScores: 0,
+      availableRating: true,
+      quantity: 0,
     };
   },
   computed: {},
@@ -218,15 +289,29 @@ export default {
     _getId() {
       return this.$route.params.id;
     },
-    
-    sendData: function(appointment, value) {
+
+    sendData: function (appointment, value) {
       this.appointment = {
-        ...appointment
+        ...appointment,
       };
       this.dialog = true;
       this.value = value;
     },
-    
+
+    setScore() {
+      db.collection("medicosInd")
+        .doc(this.id)
+        .update({
+          puntuation: {
+            accumulated: this.puntuationTotal + this.rating,
+            quantity: this.quantity + 1,
+          },
+        });
+      this._getScore();
+      this.availableRating = false;
+      console.log("saved");
+    },
+
     _retrieveData() {
       db.collection("medicosInd")
         .doc(this.id)
@@ -243,29 +328,29 @@ export default {
           this.lng = querySnapshot.data().position.lng;
           console.log("Position: " + this.lat + " , " + this.lng);
 
-          let cont=0;
+          let cont = 0;
           querySnapshot.data().attention.forEach((hour) => {
-            if (cont == 0){
-              this.attention.push("Lunes: "+hour);
+            if (cont == 0) {
+              this.attention.push("Lunes: " + hour);
               cont++;
-            }else if (cont == 1){
-              this.attention.push("Martes: "+hour);
+            } else if (cont == 1) {
+              this.attention.push("Martes: " + hour);
               cont++;
-            }else if (cont == 2){
-              this.attention.push("Miércoles: "+hour);
+            } else if (cont == 2) {
+              this.attention.push("Miércoles: " + hour);
               cont++;
-            }else if (cont == 3){
-              this.attention.push("Jueves: "+hour);
+            } else if (cont == 3) {
+              this.attention.push("Jueves: " + hour);
               cont++;
-            }else if (cont == 4){
-              this.attention.push("Viernes: "+hour);
+            } else if (cont == 4) {
+              this.attention.push("Viernes: " + hour);
               cont++;
-            }else if (cont == 5){
-              this.attention.push("Sábado: "+hour);
+            } else if (cont == 5) {
+              this.attention.push("Sábado: " + hour);
               cont++;
-            }else if (cont == 6){
-              this.attention.push("Domingo: "+hour);
-              cont=0;
+            } else if (cont == 6) {
+              this.attention.push("Domingo: " + hour);
+              cont = 0;
             }
           });
 
@@ -285,7 +370,7 @@ export default {
           this._getImages(querySnapshot.data().carrousel);
         });
     },
-    
+
     _getAttention(attentionArray) {
       let cont = 0;
       attentionArray.forEach((hour) => {
@@ -313,23 +398,42 @@ export default {
         }
       });
     },
-    
+
     _getSpecialties(specialtiesArray) {
       specialtiesArray.forEach((specialty) => {
         db.collection("especialidades")
           .doc(specialty)
           .get()
           .then((querySnapshot) => {
-            this.specialties.push(querySnapshot.data().name);
+            if (querySnapshot.data() != null) {
+              this.specialties.push(querySnapshot.data().name);
+            }
           });
       });
     },
-    
+
     _getImages(imagesArray) {
       imagesArray.forEach((image) => {
         this.items.push(image);
       });
-    }
+    },
+
+    _getScore() {
+      db.collection("medicosInd")
+        .doc(this.id)
+        .get()
+        .then((querySnapshot) => {
+          this.puntuationTotal = querySnapshot.data().puntuation.accumulated;
+          this.quantity = querySnapshot.data().puntuation.quantity;
+          this._averageScores();
+        });
+    },
+    _averageScores() {
+      var score = this.puntuationTotal / this.quantity;
+      this.averageScores = parseFloat(score.toFixed(1));
+      console.log(parseFloat(score));
+      console.log(this.averageScores);
+    },
   },
 };
 </script>
