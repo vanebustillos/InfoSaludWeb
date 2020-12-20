@@ -5,7 +5,7 @@
         <v-form ref="form">
           <v-card-title class="title">
             <v-row align="center" justify="center">
-              <h2>{{ "Agendar Cita Médica" }}</h2></v-row
+              <h2>{{ "Agendar Cita Médica" }}{{ pageName }}</h2></v-row
             ></v-card-title
           >
           <v-card-text>
@@ -56,6 +56,16 @@
                     :items="specialties"
                     label="Especialidades"
                     v-model="appointment.specialty"
+                    @change="getDoctorData()"
+                  >
+                  </v-select>
+                </v-col>
+                <v-col cols="12">
+                  <v-select
+                    :items="doctors"
+                    label="Medico"
+                    v-model="appointment.doctor"
+                    v-if="appointment.specialty != null"
                   >
                   </v-select>
                 </v-col>
@@ -225,18 +235,22 @@
 </template>
 
 <script>
-const db = require("@/firebaseConfig.js");
+import { db } from "@/firebaseConfig.js";
 import firebase from "firebase";
 
 export default {
   name: "Citas",
   data: () => ({
+    place: "",
+    pageName: "",
     now: new Date().toISOString().substr(0, 10),
     menu_date: false,
     showCurrent: true,
     menu_hour: false,
     appointments_list: [],
     specialties: [],
+    especialidadesDB: [],
+    doctors: [],
     valid: true,
     rules: {
       clientNameRules: [
@@ -300,6 +314,7 @@ export default {
           clientCi: "",
           clientPhone: "",
           specialty: "",
+          doctor: "",
           date: new Date().toISOString().substr(0, 10),
           hour: "",
           health_place: "",
@@ -309,55 +324,26 @@ export default {
     }
   },
   created: async function() {
-    console.log(this.value);
-    let citasDB = [];
-    await db.citasCollection.get().then(cita => {
-      cita.forEach(doc => {
-        citasDB.push(doc);
-        // console.log(`${doc.id} => ${doc.data()}`);
+    this.putName();
+    await db
+      .collection(this.place)
+      .doc(this.value)
+      .get()
+      .then(query => {
+        this.pageName += query.data().name;
+        if (this.place === "medicosInd") {
+          this.pageName += " " + query.data().lastname;
+        }
       });
-    });
-    if (citasDB === null) {
-      this.appointments_list = [];
-    } else {
-      citasDB.forEach(cita => {
-        this.appointments_list.push(cita);
-      });
-    }
-    let especialidadesDB = [];
-    await db.especialidadesCollection.get().then(especialidad => {
-      especialidad.forEach(doc => {
-        doc.data().establishments.forEach(q => {
-          if (q === this.value) {
-            // console.log(doc.data().establishments);
-            especialidadesDB.push(doc.data().name);
-          }
-        });
-        // console.log(`${doc.id} => ${doc.data().name}`);
-      });
-    });
-    if (especialidadesDB === null) {
-      this.specialties = [];
-    } else {
-      especialidadesDB.forEach(especialidad => {
-        this.specialties.push(especialidad);
-      });
-    }
-    let establecimientoDB = [];
-    await db.especialidadesCollection.get().then(especialidad => {
-      especialidad.forEach(doc => {
-        establecimientoDB.push(doc.data().name);
-      });
-    });
-    if (especialidadesDB === null) {
-      this.specialties = [];
-    } else {
-      especialidadesDB.forEach(especialidad => {
-        this.specialties.push(especialidad);
-      });
-    }
+    this.getAppointments();
+    this.getSpecialties();
   },
-  computed: {},
+  mounted() {},
+  computed: {
+    // getData: function() {
+    //   return this.getDoctors();
+    // }
+  },
   methods: {
     cancel() {
       this.$emit("close");
@@ -366,27 +352,126 @@ export default {
       this.appointment.clientSurnames = "";
       this.appointment.clientCi = "";
       this.appointment.clientPhone = "";
+      this.appointment.specialty = "";
+      this.appointment.doctor = "";
       this.appointment.date = "";
       this.appointment.hour = "";
       this.appointment.health_place = "";
       this.showPaymentSection = false;
     },
 
+    async getAppointments() {
+      let citasDB = [];
+      await db
+        .collection("citas")
+        .get()
+        .then(cita => {
+          cita.forEach(doc => {
+            citasDB.push(doc);
+          });
+        });
+      if (citasDB === null) {
+        this.appointments_list = [];
+      } else {
+        citasDB.forEach(cita => {
+          this.appointments_list.push(cita);
+        });
+      }
+    },
+
+    async getSpecialties() {
+      this.especialidadesDB = [];
+      await db
+        .collection("especialidades")
+        .get()
+        .then(especialidad => {
+          especialidad.forEach(doc => {
+            doc.data().establishments.forEach(q => {
+              if (q === this.value) {
+                this.especialidadesDB.push({
+                  id: doc.data().id,
+                  name: doc.data().name
+                });
+              }
+            });
+          });
+        });
+      if (this.especialidadesDB === null) {
+        this.specialties = [];
+      } else {
+        this.especialidadesDB.forEach(especialidad => {
+          this.specialties.push(especialidad.name);
+        });
+      }
+    },
+
+    async getDoctors() {
+      this.doctors = [];
+      await db
+        .collection("especialidades")
+        .get()
+        .then(especialidad => {
+          especialidad.forEach(doc => {
+            if (this.appointment.specialty === doc.data().name) {
+              this.getDoctorData(doc.data().doctors);
+              alert(doc.data().doctors);
+            }
+          });
+        });
+    },
+    // async getDoctorData(DoctorsArray) {
+    async getDoctorData() {
+      this.doctors = [];
+      let doctoresDB = [];
+      await db
+        .collection("medicos")
+        .get()
+        .then(medico => {
+          medico.forEach(doc => {
+            if (
+              doc.data().establishments === this.value &&
+              this.getSpecialtyId(this.appointment.specialty) ===
+                doc.data().specialty
+            ) {
+              let name =
+                doc.data().abbreviation +
+                " " +
+                doc.data().name +
+                " " +
+                doc.data().lastname;
+              // alert(name);
+              doctoresDB.push(name);
+            }
+          });
+        });
+      if (doctoresDB === null) {
+        this.doctors = [];
+      } else {
+        doctoresDB.forEach(doctor => {
+          this.doctors.push(doctor);
+        });
+      }
+    },
+
     addAppointment: async function() {
       if (this._validateData()) {
         if (this._validateDateFormat(this.appointment.date)) {
-          await db.citasCollection.doc(this.getAppointmentId()).set({
-            id: this.getAppointmentId(),
-            clientName: this.appointment.clientName,
-            clientSurnames: this.appointment.clientSurnames,
-            clientCi: this.appointment.clientCi,
-            clientPhone: this.appointment.clientPhone,
-            specialty: this.appointment.specialty,
-            date: this.appointment.date,
-            hour: this.appointment.hour,
-            health_place: this.value,
-            voucherURL: this.voucherURL
-          });
+          await db
+            .collection("citas")
+            .doc(this.getAppointmentId())
+            .set({
+              id: this.getAppointmentId(),
+              clientName: this.appointment.clientName,
+              clientSurnames: this.appointment.clientSurnames,
+              clientCi: this.appointment.clientCi,
+              clientPhone: this.appointment.clientPhone,
+              specialty: this.getSpecialtyId(this.appointment.specialty),
+              doctor: this.appointment.doctor,
+              date: this.appointment.date,
+              hour: this.appointment.hour,
+              health_place: this.value,
+              voucherURL: this.voucherURL
+            });
           this.cancel();
           alert("La cita ha sido guardada exitosamente");
         } else {
@@ -403,13 +488,24 @@ export default {
       let newId = 1;
       let numberOfAppointments = this.appointments_list.length;
       if (numberOfAppointments > 0) {
-        let lastId = this.appointments_list[numberOfAppointments - 1].id;
-        newId = parseInt(lastId.split("-")[1]) + 1;
+        this.appointments_list.forEach(appointment => {
+          let actualvalue = parseInt(appointment.id.split("-")[1]);
+          if (actualvalue >= newId) {
+            newId = actualvalue + 1;
+          }
+        });
       }
       return "Cita-" + newId;
     },
-    _getRouterId() {
-      return this.$route.params.id;
+
+    getSpecialtyId(name) {
+      let id = "";
+      this.especialidadesDB.forEach(especialidad => {
+        if (especialidad.name === name) {
+          id = especialidad.id;
+        }
+      });
+      return id;
     },
 
     _validateData() {
@@ -419,18 +515,17 @@ export default {
         this.appointment.clientCi !== "" &&
         this.appointment.clientPhone !== "" &&
         this.appointment.specialty !== "" &&
+        this.appointment.doctor !== "" &&
         this.appointment.date !== "" &&
         this.appointment.hour !== ""
       );
     },
 
     _validateDateFormat(appointmentDate) {
-      //let now = new Date().toISOString().substr(0, 10);
       let now = new Date();
       let year = parseInt(now.getFullYear());
       let day = parseInt(now.getDate());
       let month = parseInt(now.getMonth() + 1);
-      //let hour = parseInt(now.getHours());
       let app_date = appointmentDate.split("-");
       return (
         parseInt(app_date[0]) >= year &&
@@ -483,6 +578,21 @@ export default {
           });
         }
       );
+    },
+
+    putName() {
+      if (this.value[0] === "M" && this.value[1] === "I") {
+        this.place = "medicosInd";
+        this.pageName = " con ";
+      } else {
+        if (this.value[0] === "C") {
+          this.place = "clinicas";
+          this.pageName = " en la ";
+        } else {
+          this.place = "hospitales";
+          this.pageName = " en el ";
+        }
+      }
     }
   }
 };
