@@ -56,6 +56,16 @@
                     :items="specialties"
                     label="Especialidades"
                     v-model="appointment.specialty"
+                    @change="getDoctorData()"
+                  >
+                  </v-select>
+                </v-col>
+                <v-col cols="12">
+                  <v-select
+                    :items="doctors"
+                    label="Medico"
+                    v-model="appointment.doctor"
+                    v-if="appointment.specialty != null"
                   >
                   </v-select>
                 </v-col>
@@ -239,6 +249,8 @@ export default {
     menu_hour: false,
     appointments_list: [],
     specialties: [],
+    especialidadesDB: [],
+    doctors: [],
     valid: true,
     rules: {
       clientNameRules: [
@@ -302,6 +314,7 @@ export default {
           clientCi: "",
           clientPhone: "",
           specialty: "",
+          doctor: "",
           date: new Date().toISOString().substr(0, 10),
           hour: "",
           health_place: "",
@@ -325,7 +338,12 @@ export default {
     this.getAppointments();
     this.getSpecialties();
   },
-  computed: {},
+  mounted() {},
+  computed: {
+    // getData: function() {
+    //   return this.getDoctors();
+    // }
+  },
   methods: {
     cancel() {
       this.$emit("close");
@@ -334,6 +352,8 @@ export default {
       this.appointment.clientSurnames = "";
       this.appointment.clientCi = "";
       this.appointment.clientPhone = "";
+      this.appointment.specialty = "";
+      this.appointment.doctor = "";
       this.appointment.date = "";
       this.appointment.hour = "";
       this.appointment.health_place = "";
@@ -360,7 +380,7 @@ export default {
     },
 
     async getSpecialties() {
-      let especialidadesDB = [];
+      this.especialidadesDB = [];
       await db
         .collection("especialidades")
         .get()
@@ -368,19 +388,71 @@ export default {
           especialidad.forEach(doc => {
             doc.data().establishments.forEach(q => {
               if (q === this.value) {
-                especialidadesDB.push(doc.data().name);
+                this.especialidadesDB.push({
+                  id: doc.data().id,
+                  name: doc.data().name
+                });
               }
             });
           });
         });
-      if (especialidadesDB === null) {
+      if (this.especialidadesDB === null) {
         this.specialties = [];
       } else {
-        especialidadesDB.forEach(especialidad => {
-          this.specialties.push(especialidad);
+        this.especialidadesDB.forEach(especialidad => {
+          this.specialties.push(especialidad.name);
         });
       }
     },
+
+    async getDoctors() {
+      this.doctors = [];
+      await db
+        .collection("especialidades")
+        .get()
+        .then(especialidad => {
+          especialidad.forEach(doc => {
+            if (this.appointment.specialty === doc.data().name) {
+              this.getDoctorData(doc.data().doctors);
+              alert(doc.data().doctors);
+            }
+          });
+        });
+    },
+    // async getDoctorData(DoctorsArray) {
+    async getDoctorData() {
+      this.doctors = [];
+      let doctoresDB = [];
+      await db
+        .collection("medicos")
+        .get()
+        .then(medico => {
+          medico.forEach(doc => {
+            if (
+              doc.data().establishments === this.value &&
+              this.getSpecialtyId(this.appointment.specialty) ===
+                doc.data().specialty
+            ) {
+              let name =
+                doc.data().abbreviation +
+                " " +
+                doc.data().name +
+                " " +
+                doc.data().lastname;
+              // alert(name);
+              doctoresDB.push(name);
+            }
+          });
+        });
+      if (doctoresDB === null) {
+        this.doctors = [];
+      } else {
+        doctoresDB.forEach(doctor => {
+          this.doctors.push(doctor);
+        });
+      }
+    },
+
     addAppointment: async function() {
       if (this._validateData()) {
         if (this._validateDateFormat(this.appointment.date)) {
@@ -393,7 +465,8 @@ export default {
               clientSurnames: this.appointment.clientSurnames,
               clientCi: this.appointment.clientCi,
               clientPhone: this.appointment.clientPhone,
-              specialty: this.appointment.specialty,
+              specialty: this.getSpecialtyId(this.appointment.specialty),
+              doctor: this.appointment.doctor,
               date: this.appointment.date,
               hour: this.appointment.hour,
               health_place: this.value,
@@ -425,6 +498,16 @@ export default {
       return "Cita-" + newId;
     },
 
+    getSpecialtyId(name) {
+      let id = "";
+      this.especialidadesDB.forEach(especialidad => {
+        if (especialidad.name === name) {
+          id = especialidad.id;
+        }
+      });
+      return id;
+    },
+
     _validateData() {
       return (
         this.appointment.clientName !== "" &&
@@ -432,6 +515,7 @@ export default {
         this.appointment.clientCi !== "" &&
         this.appointment.clientPhone !== "" &&
         this.appointment.specialty !== "" &&
+        this.appointment.doctor !== "" &&
         this.appointment.date !== "" &&
         this.appointment.hour !== ""
       );
