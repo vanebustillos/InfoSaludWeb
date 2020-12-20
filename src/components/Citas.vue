@@ -226,7 +226,6 @@
 
 <script>
 import { db } from "@/firebaseConfig.js";
-// const db = require("@/firebaseConfig.js");
 import firebase from "firebase";
 
 export default {
@@ -416,13 +415,14 @@ export default {
       let newId = 1;
       let numberOfAppointments = this.appointments_list.length;
       if (numberOfAppointments > 0) {
-        let lastId = this.appointments_list[numberOfAppointments - 1].id;
-        newId = parseInt(lastId.split("-")[1]) + 1;
+        this.appointments_list.forEach(appointment => {
+          let actualvalue = parseInt(appointment.id.split("-")[1]);
+          if (actualvalue >= newId) {
+            newId = actualvalue + 1;
+          }
+        });
       }
       return "Cita-" + newId;
-    },
-    _getRouterId() {
-      return this.$route.params.id;
     },
 
     _validateData() {
@@ -438,12 +438,10 @@ export default {
     },
 
     _validateDateFormat(appointmentDate) {
-      //let now = new Date().toISOString().substr(0, 10);
       let now = new Date();
       let year = parseInt(now.getFullYear());
       let day = parseInt(now.getDate());
       let month = parseInt(now.getMonth() + 1);
-      //let hour = parseInt(now.getHours());
       let app_date = appointmentDate.split("-");
       return (
         parseInt(app_date[0]) >= year &&
