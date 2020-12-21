@@ -58,16 +58,15 @@
                   {{ clinic.phones }}
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <router-link :to="{
-                name: 'ClinicsInfo',
-                params: { id: clinic.id }
-              }">
-                <v-btn
-                class="ma-2"
-                id="info"
-                :rounded="true"
-                color="#D6DBDF"
-                >Ver más</v-btn>
+              <router-link
+                :to="{
+                  name: 'ClinicsInfo',
+                  params: { id: clinic.id }
+                }"
+              >
+                <v-btn class="ma-2" id="info" :rounded="true" color="#D6DBDF"
+                  >Ver más</v-btn
+                >
               </router-link>
             </v-list-item>
           </v-card>
@@ -111,11 +110,9 @@ export default {
     ...mapActions(["getclinics"]),
     _getClinics() {
       db.collection("clinicas")
-        .limit(2)
         .orderBy("id")
         .get()
         .then(querySnapshot => {
-          //Get the last element
           this.last = querySnapshot.docs[querySnapshot.docs.length - 1];
           querySnapshot.forEach(doc => {
             this.clinics.push(doc.data());
@@ -123,9 +120,8 @@ export default {
           });
         });
     },
-    _getSpecialties() {
+    async _getSpecialties() {
       db.collection("especialidades")
-        .limit(2)
         .orderBy("name")
         .get()
         .then(querySnapshot => {

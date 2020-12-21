@@ -260,7 +260,7 @@ export default {
     Citas,
     gmapsMap,
     gmapsMarker,
-    Comments,
+    Comments
   },
 
   data() {
@@ -289,19 +289,19 @@ export default {
         {
           //position: { lat: this.lat, lng: this.lng },
           position: { lat: -17.37863551610984, lng: -66.16464417294189 },
-          title: this.name,
-        },
+          title: this.name
+        }
       ],
       mapOptions: {
         // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.37863551610984, lng: -66.16464417294189 },
-        zoom: 16,
+        zoom: 16
       },
       puntuationTotal: 0,
       rating: 0,
       averageScores: 0,
       availableRating: true,
-      quantity: 0,
+      quantity: 0
     };
   },
   computed: {},
@@ -313,9 +313,9 @@ export default {
     _getId() {
       return this.$route.params.id;
     },
-    sendData: function (appointment, value) {
+    sendData: function(appointment, value) {
       this.appointment = {
-        ...appointment,
+        ...appointment
       };
       this.dialog = true;
       this.value = value;
@@ -326,8 +326,8 @@ export default {
         .update({
           puntuation: {
             accumulated: this.puntuationTotal + this.rating,
-            quantity: this.quantity + 1,
-          },
+            quantity: this.quantity + 1
+          }
         });
       this._getScore();
       this.availableRating = false;
@@ -337,7 +337,7 @@ export default {
       db.collection("clinicas")
         .doc(this.id)
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.name = querySnapshot.data().name;
           this.address = querySnapshot.data().location;
           this.web = querySnapshot.data().webpage;
@@ -348,7 +348,7 @@ export default {
           this.lng = querySnapshot.data().position.lng;
           console.log("Position: " + this.lat + " , " + this.lng);
 
-          querySnapshot.data().phones.forEach((phone) => {
+          querySnapshot.data().phones.forEach(phone => {
             if (this.telephones == "") {
               this.telephones = phone;
             } else {
@@ -369,7 +369,7 @@ export default {
 
     _getAttention(attentionArray) {
       let cont = 0;
-      attentionArray.forEach((hour) => {
+      attentionArray.forEach(hour => {
         if (cont == 0) {
           this.attention.push("Lunes: " + hour);
           cont++;
@@ -396,11 +396,11 @@ export default {
     },
 
     _getSpecialties(specialtiesArray) {
-      specialtiesArray.forEach((specialty) => {
+      specialtiesArray.forEach(specialty => {
         db.collection("especialidades")
           .doc(specialty)
           .get()
-          .then((querySnapshot) => {
+          .then(querySnapshot => {
             if (querySnapshot.data() != null) {
               this.specialties.push(querySnapshot.data().name);
             }
@@ -409,18 +409,18 @@ export default {
     },
 
     _getServices(servicesArray) {
-      servicesArray.forEach((service) => {
+      servicesArray.forEach(service => {
         db.collection("servicios")
           .doc(service)
           .get()
-          .then((querySnapshot) => {
+          .then(querySnapshot => {
             this.services.push(querySnapshot.data().name);
           });
       });
     },
 
     _getImages(imagesArray) {
-      imagesArray.forEach((image) => {
+      imagesArray.forEach(image => {
         this.items.push(image);
       });
     },
@@ -428,18 +428,21 @@ export default {
       db.collection("clinicas")
         .doc(this.id)
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.puntuationTotal = querySnapshot.data().puntuation.accumulated;
           this.quantity = querySnapshot.data().puntuation.quantity;
           this._averageScores();
         });
     },
     _averageScores() {
-      var score = this.puntuationTotal / this.quantity;
-      this.averageScores = parseFloat(score.toFixed(1));
-      console.log(parseFloat(score));
-      console.log(this.averageScores);
-    },
-  },
+      var score = 0;
+      if (this.puntuationTotal != 0 && this.quantity != 0) {
+        score = this.puntuationTotal / this.quantity;
+        this.averageScores = parseFloat(score.toFixed(1));
+        console.log(parseFloat(score));
+        console.log(this.averageScores);
+      }
+    }
+  }
 };
 </script>

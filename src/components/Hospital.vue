@@ -114,7 +114,6 @@ export default {
         .orderBy("id")
         .get()
         .then(querySnapshot => {
-          //Get the last element
           this.last = querySnapshot.docs[querySnapshot.docs.length - 1];
           querySnapshot.forEach(doc => {
             this.hospitals.push(doc.data());

@@ -304,8 +304,8 @@ export default {
         .update({
           puntuation: {
             accumulated: this.puntuationTotal + this.rating,
-            quantity: this.quantity + 1,
-          },
+            quantity: this.quantity + 1
+          }
         });
       this._getScore();
       this.availableRating = false;
@@ -316,7 +316,7 @@ export default {
       db.collection("medicosInd")
         .doc(this.id)
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.name =
             querySnapshot.data().name + " " + querySnapshot.data().lastname;
           this.address = querySnapshot.data().location;
@@ -329,7 +329,7 @@ export default {
           console.log("Position: " + this.lat + " , " + this.lng);
 
           let cont = 0;
-          querySnapshot.data().attention.forEach((hour) => {
+          querySnapshot.data().attention.forEach(hour => {
             if (cont == 0) {
               this.attention.push("Lunes: " + hour);
               cont++;
@@ -354,7 +354,7 @@ export default {
             }
           });
 
-          querySnapshot.data().phones.forEach((phone) => {
+          querySnapshot.data().phones.forEach(phone => {
             if (this.telephones == "") {
               this.telephones = phone;
             } else {
@@ -373,7 +373,7 @@ export default {
 
     _getAttention(attentionArray) {
       let cont = 0;
-      attentionArray.forEach((hour) => {
+      attentionArray.forEach(hour => {
         if (cont == 0) {
           this.attention.push("Lunes: " + hour);
           cont++;
@@ -400,11 +400,11 @@ export default {
     },
 
     _getSpecialties(specialtiesArray) {
-      specialtiesArray.forEach((specialty) => {
+      specialtiesArray.forEach(specialty => {
         db.collection("especialidades")
           .doc(specialty)
           .get()
-          .then((querySnapshot) => {
+          .then(querySnapshot => {
             if (querySnapshot.data() != null) {
               this.specialties.push(querySnapshot.data().name);
             }
@@ -413,7 +413,7 @@ export default {
     },
 
     _getImages(imagesArray) {
-      imagesArray.forEach((image) => {
+      imagesArray.forEach(image => {
         this.items.push(image);
       });
     },
@@ -422,7 +422,7 @@ export default {
       db.collection("medicosInd")
         .doc(this.id)
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           this.puntuationTotal = querySnapshot.data().puntuation.accumulated;
           this.quantity = querySnapshot.data().puntuation.quantity;
           this._averageScores();
@@ -433,7 +433,7 @@ export default {
       this.averageScores = parseFloat(score.toFixed(1));
       console.log(parseFloat(score));
       console.log(this.averageScores);
-    },
-  },
+    }
+  }
 };
 </script>

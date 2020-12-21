@@ -68,17 +68,17 @@ export default {
     author: "",
     content: "",
     name: "",
-    commentRule: [(v) => !!v || "Campo requerido"],
-    comments: [],
+    commentRule: [v => !!v || "Campo requerido"],
+    comments: []
   }),
 
   props: {
     place: {
-      type: String,
+      type: String
     },
     doc: {
-      type: String,
-    },
+      type: String
+    }
   },
 
   mounted() {
@@ -94,13 +94,13 @@ export default {
             comments: firebase.firestore.FieldValue.arrayUnion({
               date: this._getCurrentDate(),
               author: this.author,
-              content: this.content,
-            }),
+              content: this.content
+            })
           });
         this.comments.push({
           date: this._getCurrentDate(),
           author: this.author,
-          content: this.content,
+          content: this.content
         });
         this.$refs.form.reset();
       }
@@ -119,20 +119,19 @@ export default {
       db.collection(this.place)
         .doc(this.doc)
         .get()
-        .then((querySnapshot) => {
+        .then(querySnapshot => {
           if (querySnapshot.data() != null) {
-            querySnapshot.data().comments.forEach((comment) => {
+            querySnapshot.data().comments.forEach(comment => {
               this.comments.push({
                 date: comment.date,
                 author: comment.author,
-                content: comment.content,
+                content: comment.content
               });
             });
           }
         });
-    },
-  },
+    }
+  }
 };
 </script>
-<style>
-</style>
+<style></style>

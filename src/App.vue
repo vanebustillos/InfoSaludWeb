@@ -43,11 +43,6 @@
         </v-btn>
       </div>
       <v-spacer></v-spacer>
-      <div>
-        <v-btn icon>
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-      </div>
     </v-app-bar>
     <v-main>
       <router-view />

@@ -2,11 +2,13 @@
   <div>
     <br />
     <v-row class="mb-6" justify="center" dense>
-      <v-col color="secondary" cols="10">
+      <v-col cols="10">
         <v-carousel
           hide-delimiter-background
           delimiter-icon="mdi-minus"
           height="550"
+          cycle
+          show-arrows-on-hover
         >
           <div class="secondary" dark>
             <v-carousel-item
@@ -21,14 +23,11 @@
     <v-container fluid>
       <v-row class="mb-6" justify="center" dense>
         <v-col v-for="card in cards" :key="card.title" cols="3">
-          <v-card color="secondary" dark @click="routingViews(card.title)">
+          <v-card color="primary" dark @click="routingViews(card.title)">
             <div align="center">
               <v-icon size="100">{{ card.icon }}</v-icon>
-              <!--v-img :src="card.src" class="white--text align-end" height="180px"-->
             </div>
             <v-card-title v-text="card.title"></v-card-title>
-            <!--/v-img-->
-
             <v-card-actions>
               <v-spacer></v-spacer>
               <span>{{ card.description }}</span>
@@ -41,29 +40,25 @@
   </div>
 </template>
 <script>
-import hospitalImg from "@/assets/hospital.png";
 export default {
   name: "Initial",
   data() {
     return {
       cards: [
         {
-          title: "Hospitales",
-          src: hospitalImg,
+          title: "HOSPITALES",
           icon: "mdi-hospital-building",
-          description: "descripción de hospitales"
+          description: "Hospitales Públicos y Privados"
         },
         {
-          title: "Clínicas",
-          src: hospitalImg,
+          title: "CLÍNICAS",
           icon: "mdi-hospital",
-          description: "descripción de clínicas"
+          description: "Clínicas Públicas y Privadas"
         },
         {
-          title: "Médicos",
-          src: hospitalImg,
+          title: "MÉDICOS",
           icon: "mdi-doctor",
-          description: "descripción de Médicos"
+          description: "Médicos Privados"
         }
       ],
       items: [
@@ -85,13 +80,13 @@ export default {
   computed: {},
   methods: {
     routingViews(clicked) {
-      if (clicked == "Hospitales") {
+      if (clicked == "HOSPITALES") {
         this.$router.push("/hospitales").catch(() => {});
       }
-      if (clicked == "Clínicas") {
+      if (clicked == "CLÍNICAS") {
         this.$router.push("/clinicas").catch(() => {});
       }
-      if (clicked == "Médicos") {
+      if (clicked == "MÉDICOS") {
         this.$router.push("/medicos").catch(() => {});
       }
     }
