@@ -110,7 +110,6 @@ export default {
     ...mapActions(["getclinics"]),
     _getClinics() {
       db.collection("clinicas")
-        .orderBy("id")
         .get()
         .then(querySnapshot => {
           this.last = querySnapshot.docs[querySnapshot.docs.length - 1];

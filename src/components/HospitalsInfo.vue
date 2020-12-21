@@ -287,13 +287,11 @@ export default {
       place: "",
       markers: [
         {
-          //position: { lat: this.lat, lng: this.lng },
           position: { lat: -17.37155059512898, lng: -66.16109964427892 },
           title: this.name
         }
       ],
       mapOptions: {
-        // center: { lat: this.lat, lng: this.lng },
         center: { lat: -17.37155059512898, lng: -66.16109964427892 },
         zoom: 16
       },
@@ -332,10 +330,9 @@ export default {
         });
       this._getScore();
       this.availableRating = false;
-      console.log("saved");
     },
-    _retrieveData() {
-      db.collection("hospitales")
+    async _retrieveData() {
+      await db.collection("hospitales")
         .doc(this.id)
         .get()
         .then(querySnapshot => {
@@ -347,7 +344,6 @@ export default {
           this.img = querySnapshot.data().img;
           this.lat = querySnapshot.data().position.lat;
           this.lng = querySnapshot.data().position.lng;
-          console.log("Position: " + this.lat + " , " + this.lng);
           querySnapshot.data().phones.forEach(phone => {
             if (this.telephones == "") {
               this.telephones = phone;
@@ -438,8 +434,6 @@ export default {
       if (this.puntuationTotal != 0 && this.quantity != 0) {
         score = this.puntuationTotal / this.quantity;
         this.averageScores = parseFloat(score.toFixed(1));
-        console.log(parseFloat(score));
-        console.log(this.averageScores);
       }
     }
   }

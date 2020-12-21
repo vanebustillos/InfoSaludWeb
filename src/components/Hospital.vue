@@ -111,7 +111,6 @@ export default {
     ...mapActions(["getHospitals", "getDatos"]),
     async _getHospitales() {
       db.collection("hospitales")
-        .orderBy("id")
         .get()
         .then(querySnapshot => {
           this.last = querySnapshot.docs[querySnapshot.docs.length - 1];
@@ -132,7 +131,6 @@ export default {
         });
     },
     filterData() {
-      console.log(this.selectedRegion + " " + this.selectedSpecialty);
       this.filteredData = [];
       db.collection("especialidades")
         .orderBy("name")

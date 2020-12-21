@@ -91,7 +91,6 @@ export default {
     ...mapActions(["getdoctors"]),
     _getdoctors() {
       db.collection("medicosInd")
-        .orderBy("id")
         .get()
         .then(querySnapshot => {
           //Get the last element
