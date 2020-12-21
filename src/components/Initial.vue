@@ -6,7 +6,7 @@
         <v-carousel
           hide-delimiter-background
           delimiter-icon="mdi-minus"
-          height="550"
+          height="570"
           cycle
           show-arrows-on-hover
         >
@@ -14,7 +14,7 @@
             <v-carousel-item
               v-for="(item, i) in items"
               :key="i"
-              :src="item.src"
+              :src="item"
             ></v-carousel-item>
           </div>
         </v-carousel>
@@ -40,6 +40,7 @@
   </div>
 </template>
 <script>
+import { db } from "@/firebaseConfig.js";
 export default {
   name: "Initial",
   data() {
@@ -61,21 +62,11 @@ export default {
           description: "Médicos Privados"
         }
       ],
-      items: [
-        {
-          src:
-            "https://www.lostiempos.com/sites/default/files/styles/noticia_detalle/public/media_imagen/2010/2/12/103224.jpg?itok=0ZxcMBJM"
-        },
-        {
-          src:
-            "https://isaicontroles.com/wp-content/uploads/2018/11/clinica-ebriovid-2-2000x1200.jpg"
-        },
-        {
-          src:
-            "https://elpotosi.net/img/contents/images_980/2020/06/23/819958af-951d-45af-a426-aa671e00f701.jpg"
-        }
-      ]
+       items: []
     };
+  },
+  mounted() {
+    this._getImages();
   },
   computed: {},
   methods: {
@@ -89,6 +80,24 @@ export default {
       if (clicked == "MÉDICOS") {
         this.$router.push("/medicos").catch(() => {});
       }
+    },
+    async _getImages() {
+      await db
+        .collection("inicio")
+        .doc("I1")
+        .get()
+        .then(querySnapshot => {
+          //  if (querySnapshot.data() != null) {
+          querySnapshot.data().carrousel.forEach(image => {
+            console.log(image);
+            this.items.push(image);
+          });
+          //   }
+          console.log(querySnapshot.data());
+        });
+
+      console.log(this.items.length);
+      //return this.items;
     }
   }
 };
