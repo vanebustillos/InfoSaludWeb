@@ -282,6 +282,7 @@ export default {
   mounted() {
     this.id = this._getId();
     this._retrieveData();
+    this._getScore();
   },
   methods: {
     _getId() {

@@ -89,6 +89,7 @@ export default {
       selectedSpecialty: "",
       regions: [
         "Zona Norte",
+        "Cerdado",
         "Colcapirhua",
         "Tiquipaya",
         "Quillacollo",
