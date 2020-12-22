@@ -22,7 +22,7 @@
     </v-row>
     <v-container fluid>
       <v-row class="mb-6" justify="center" dense>
-        <v-col v-for="card in cards" :key="card.title" cols="3">
+        <v-col v-for="card in cards" :key="card.title" cols="3" md="3">
           <v-card color="primary" dark @click="routingViews(card.title)">
             <div align="center">
               <v-icon size="100">{{ card.icon }}</v-icon>

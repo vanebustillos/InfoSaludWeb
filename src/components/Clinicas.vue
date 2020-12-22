@@ -39,7 +39,7 @@
     </v-container>
     <v-container>
       <v-row v-for="(clinic, index) in filteredData" :key="index">
-        <v-col class="mx-auto" cols="12" md="7">
+        <v-col class="mx-auto" cols="12" md="9">
           <v-card tile hover color="#F6F6F6">
             <v-list-item three-line>
               <v-list-item-avatar tile size="100" color="#FFFFFF">

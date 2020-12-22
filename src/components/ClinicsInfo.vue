@@ -331,7 +331,8 @@ export default {
       this.availableRating = false;
     },
     async _retrieveData() {
-      await db.collection("clinicas")
+      await db
+        .collection("clinicas")
         .doc(this.id)
         .get()
         .then(querySnapshot => {
