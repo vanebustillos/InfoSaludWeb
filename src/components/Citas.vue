@@ -60,12 +60,14 @@
                   >
                   </v-select>
                 </v-col>
-                <v-col cols="12">
+                <v-col
+                  cols="12"
+                  v-if="place != 'medicosInd' && appointment.specialty != null"
+                >
                   <v-select
                     :items="doctors"
                     label="Medico"
                     v-model="appointment.doctor"
-                    v-if="appointment.specialty != null"
                   >
                   </v-select>
                 </v-col>
@@ -537,7 +539,7 @@ export default {
     getQR() {
       this.showPaymentSection = true;
       this.qrURL = null;
-      const storageRef = firebase.storage().ref("images/QR_200.jpg");
+      const storageRef = firebase.storage().ref("images/QR1.jpeg");
       storageRef.getDownloadURL().then(url => {
         this.qrURL = url;
         console.log(url);
