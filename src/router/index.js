@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-
 Vue.use(VueRouter);
 
 const routes = [
@@ -9,6 +8,44 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home
+  },
+  {
+    path: "/hospitales",
+    name: "Hospital",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Hospital.vue")
+  },
+  {
+    path: "/clinicas",
+    name: "Clinicas",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Clinicas.vue")
+  },
+  {
+    path: "/medicos",
+    name: "Medicos",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/Medicos.vue")
+  },
+  {
+    path: "/hospitalsInfo/:id",
+    name: "HospitalsInfo",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/HospitalsInfo.vue")
+  },
+  {
+    path: "/clinicsInfo/:id",
+    name: "ClinicsInfo",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../components/ClinicsInfo.vue")
+  },
+  {
+    path: "/independentDocsInfo/:id",
+    name: "IndependentDocsInfo",
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ "../components/IndependentDocsInfo.vue"
+      )
   },
   {
     path: "/about",
